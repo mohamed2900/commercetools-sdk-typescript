@@ -48,6 +48,8 @@ export function getOptions(
     credentials: _credentials ? true : false,
     httpMiddlewareOptions: {
       host: process.env.CTP_HOST_URL,
+      includeResponseHeaders: true,
+      includeOriginalRequest: true,
       fetch,
     },
   }

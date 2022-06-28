@@ -152,6 +152,7 @@ export default function createHttpMiddleware({
       }
       let retryCount = 0
       // wrap in a fn so we can retry if error occur
+      const nextRequestHeaders = Object.assign({}, request.headers)
       function executeFetch() {
         // Kick off timer for abortController directly before fetch.
         let timer: ReturnType<typeof setTimeout>
@@ -283,6 +284,39 @@ export default function createHttpMiddleware({
                   error,
                   statusCode: res.status,
                 }
+
+                if (parsedResponse.error.statusCode === 409) {
+                  const retryConfig = {
+                    timeout,
+                    maxRetries,
+                    backoff,
+                    retryDelay,
+                    maxDelay,
+                    enableRetry,
+                  }
+
+                  const responseOptions = {
+                    fetch: fetchFunction,
+                    fetchOptions,
+                    retryConfig,
+                    maskSensitiveHeaderData,
+                    includeResponseHeaders,
+                    includeOriginalRequest,
+                    includeRequestInErrorResponse,
+                  }
+                  const nextRequest: MiddlewareRequest = {
+                    ...request,
+                    headers: nextRequestHeaders,
+                  }
+                  const nextResponse: MiddlewareResponse = {
+                    ...parsedResponse,
+                    request: responseOptions,
+                  }
+
+                  next(nextRequest, nextResponse)
+                  return
+                }
+
                 next(request, parsedResponse)
               })
             },

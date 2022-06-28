@@ -83,7 +83,7 @@ export type MiddlewareResponse = {
   error?: HttpErrorType
   statusCode: number
   headers?: JsonObject<string>
-  request?: JsonObject
+  request?: JsonObject<any>
 }
 
 export type Dispatch = (
@@ -518,3 +518,5 @@ export type ExistingTokenMiddlewareOptions = {
 export type CorrelationIdMiddlewareOptions = {
   generate: () => string
 }
+
+export type ConcurrentModificationMiddlewareOptions = HttpMiddlewareOptions & RequestOptions

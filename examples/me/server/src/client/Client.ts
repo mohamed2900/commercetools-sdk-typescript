@@ -38,20 +38,30 @@ class Client {
     const { projectKey, authMiddleware, httpMiddlewareOptions, credentials } =
       options
     if (credentials) {
-      return userClientBuilder
+      return (
+        userClientBuilder
+          .withProjectKey(projectKey)
+          .withMiddleware(authMiddleware)
+          .withHttpMiddleware(httpMiddlewareOptions)
+          // .withLoggerMiddleware()
+          .withConcurrentModificationMiddleware({
+            host: 'https://api.europe-west1.gcp.commercetools.com',
+          })
+          .build()
+      )
+    }
+
+    return (
+      anonymousClientBuilder
         .withProjectKey(projectKey)
         .withMiddleware(authMiddleware)
         .withHttpMiddleware(httpMiddlewareOptions)
-        .withLoggerMiddleware()
+        // .withLoggerMiddleware()
+        .withConcurrentModificationMiddleware({
+          host: 'https://api.europe-west1.gcp.commercetools.com',
+        })
         .build()
-    }
-
-    return anonymousClientBuilder
-      .withProjectKey(projectKey)
-      .withMiddleware(authMiddleware)
-      .withHttpMiddleware(httpMiddlewareOptions)
-      .withLoggerMiddleware()
-      .build()
+    )
   }
 
   getProjectKey() {
