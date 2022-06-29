@@ -328,29 +328,39 @@ export type ProductSelectionUpdateAction =
   | ProductSelectionSetCustomTypeAction
   | ProductSelectionSetKeyAction
   | ProductSelectionSetVariantSelectionAction
+/**
+ *	Polymorphic base type for Product Variant Selections. The actual type is determined by the `type` field.
+ *
+ */
 export type ProductVariantSelection =
   | ProductVariantSelectionExclusion
   | ProductVariantSelectionInclusion
+/**
+ *	All Product Variants except the explicitly stated SKUs are part of the Product Selection.
+ *
+ */
 export interface ProductVariantSelectionExclusion {
   readonly type: 'exclusion'
   /**
-   *	Non-empty array of SKUs.
+   *	Non-empty array of SKUs representing Product Variants to be excluded from the Product Selection.
    *
-   */
-  readonly skus: string[]
-}
-export interface ProductVariantSelectionInclusion {
-  readonly type: 'inclusion'
-  /**
-   *	Non-empty array of SKUs.
    *
    */
   readonly skus: string[]
 }
 /**
- *	The following types of Product Variant Selections are supported:
+ *	Only Product Variants with explicitly stated SKUs are part of the Product Selection.
  *
  */
+export interface ProductVariantSelectionInclusion {
+  readonly type: 'inclusion'
+  /**
+   *	Non-empty array of SKUs representing Product Variants to be included into the Product Selection.
+   *
+   *
+   */
+  readonly skus: string[]
+}
 export type ProductVariantSelectionTypeEnum = 'exclusion' | 'inclusion'
 /**
  *	[PagedQueryResult](/general-concepts#pagedqueryresult) containing an array of [ProductSelectionAssignment](ctp:api:type:ProductSelectionAssignment).
@@ -470,8 +480,8 @@ export interface ProductSelectionSetKeyAction {
   readonly key?: string
 }
 /**
- *	Updates the Variant Selection of an existing Product Selection Assignment.
- *	If the given Product is not assigned to the Product Selection [ProductAssignmentMissing](/errors#product-selections) is raised.'
+ *	Updates the Product Variant Selection of an existing [Product Selection Assignment](ctp:api:type:ProductSelectionAssignment).
+ *	If the given Product is not assigned to the Product Selection [ProductAssignmentMissing](/errors#product-selections) error is raised.
  *
  */
 export interface ProductSelectionSetVariantSelectionAction {

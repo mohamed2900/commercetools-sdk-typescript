@@ -4762,6 +4762,8 @@ export interface ProductSelectionProductAddedMessage {
    */
   readonly product: ProductReference
   /**
+   *	Polymorphic base type for Product Variant Selections. The actual type is determined by the `type` field.
+   *
    *
    */
   readonly variantSelection?: ProductVariantSelection
@@ -6920,6 +6922,8 @@ export interface ProductSelectionProductAddedMessagePayload {
    */
   readonly product: ProductReference
   /**
+   *	Polymorphic base type for Product Variant Selections. The actual type is determined by the `type` field.
+   *
    *
    */
   readonly variantSelection?: ProductVariantSelection
