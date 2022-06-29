@@ -216,21 +216,6 @@ export default function createHttpMiddleware({
                 })
                 return
               }
-              // if (res.status === 503 && enableRetry)
-              //   if (retryCount < maxRetries) {
-              //     setTimeout(
-              //       executeFetch,
-              //       calcDelayDuration(
-              //         retryCount,
-              //         retryDelay,
-              //         maxRetries,
-              //         backoff,
-              //         maxDelay
-              //       )
-              //     )
-              //     retryCount += 1
-              //     return
-              //   }
 
               // Server responded with an error. Try to parse it as JSON, then
               // return a proper error type with all necessary meta information.
@@ -283,6 +268,33 @@ export default function createHttpMiddleware({
                   error,
                   statusCode: res.status,
                 }
+
+                if (parsedResponse.error.statusCode === 409) {
+                  // extract the currentVersion from error body
+                  const version = response.error.body.errors[0].currentVersion
+                  const body =
+                    typeof fetchOptions.body == 'string'
+                      ? { ...JSON.parse(fetchOptions.body), version }
+                      : fetchOptions.body
+                  fetchOptions.body = JSON.stringify(body)
+
+                  console.log('here', fetchOptions)
+                  if (retryCount < maxRetries) {
+                    setTimeout(
+                      executeFetch,
+                      calcDelayDuration(
+                        retryCount,
+                        retryDelay,
+                        maxRetries,
+                        backoff,
+                        maxDelay
+                      )
+                    )
+                    retryCount += 1
+                    return
+                  }
+                }
+
                 next(request, parsedResponse)
               })
             },
