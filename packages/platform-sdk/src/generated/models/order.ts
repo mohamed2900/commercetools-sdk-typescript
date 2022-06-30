@@ -131,6 +131,7 @@ import {
 } from './order-edit'
 import { PaymentReference, PaymentResourceIdentifier } from './payment'
 import { Attribute } from './product'
+import { QuoteReference, QuoteResourceIdentifier } from './quote'
 import {
   ShippingMethodResourceIdentifier,
   ShippingRateDraft,
@@ -548,6 +549,11 @@ export interface Order extends BaseResource {
    */
   readonly cart?: CartReference
   /**
+   *	Set when this order was created from a quote.
+   *
+   */
+  readonly quote?: QuoteReference
+  /**
    *
    */
   readonly custom?: CustomFields
@@ -637,6 +643,43 @@ export interface OrderFromCartDraft {
    *
    */
   readonly custom?: CustomFieldsDraft
+}
+export interface OrderFromQuoteDraft {
+  /**
+   *	ResourceIdentifier to the Quote from which this order is created. If the quote has `QuoteState` in `Accepted`, `Declined` or `Withdrawn` then the order creation will fail. The creation will also if the `Quote` has expired (`validTo` check).
+   *
+   */
+  readonly quote: QuoteResourceIdentifier
+  /**
+   *
+   */
+  readonly version: number
+  /**
+   *	String that uniquely identifies an order.
+   *	It can be used to create more human-readable (in contrast to ID) identifier for the order.
+   *	It should be unique across a project.
+   *	Once it's set it cannot be changed.
+   *	For easier use on Get, Update and Delete actions we suggest assigning order numbers that match the regular expression `[a-z0-9_\-]{2,36}`.
+   *
+   */
+  readonly orderNumber?: string
+  /**
+   *
+   */
+  readonly paymentState?: PaymentState
+  /**
+   *
+   */
+  readonly shipmentState?: ShipmentState
+  /**
+   *	Order will be created with `Open` status by default.
+   *
+   */
+  readonly orderState?: OrderState
+  /**
+   *
+   */
+  readonly state?: StateResourceIdentifier
 }
 export interface OrderImportDraft {
   /**
