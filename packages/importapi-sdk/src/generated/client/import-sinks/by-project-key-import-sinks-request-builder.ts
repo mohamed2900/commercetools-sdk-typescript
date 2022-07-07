@@ -11,7 +11,9 @@ import {
 import { executeRequest, QueryParam } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyImportSinksByImportSinkKeyRequestBuilder } from './by-project-key-import-sinks-by-import-sink-key-request-builder'
-
+/**
+@deprecated
+**/
 export class ByProjectKeyImportSinksRequestBuilder {
   constructor(
     protected readonly args: {

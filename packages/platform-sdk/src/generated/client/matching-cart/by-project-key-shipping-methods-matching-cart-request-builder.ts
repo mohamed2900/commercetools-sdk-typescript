@@ -6,7 +6,8 @@
 import { ShippingMethodPagedQueryResponse } from '../../models/shipping-method'
 import { executeRequest, QueryParam } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
-
+/**
+ **/
 export class ByProjectKeyShippingMethodsMatchingCartRequestBuilder {
   constructor(
     protected readonly args: {

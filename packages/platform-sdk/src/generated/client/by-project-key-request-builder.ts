@@ -39,7 +39,8 @@ import { ByProjectKeySubscriptionsRequestBuilder } from './subscriptions/by-proj
 import { ByProjectKeyTaxCategoriesRequestBuilder } from './tax-categories/by-project-key-tax-categories-request-builder'
 import { ByProjectKeyTypesRequestBuilder } from './types/by-project-key-types-request-builder'
 import { ByProjectKeyZonesRequestBuilder } from './zones/by-project-key-zones-request-builder'
-
+/**
+ **/
 export class ByProjectKeyRequestBuilder {
   constructor(
     protected readonly args: {

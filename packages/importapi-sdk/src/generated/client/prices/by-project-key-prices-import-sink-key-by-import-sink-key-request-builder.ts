@@ -7,7 +7,9 @@ import { ImportResponse, PriceImportRequest } from '../../models/importrequests'
 import { executeRequest } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyPricesImportSinkKeyByImportSinkKeyImportOperationsRequestBuilder } from '../import-operations/by-project-key-prices-import-sink-key-by-import-sink-key-import-operations-request-builder'
-
+/**
+@deprecated
+**/
 export class ByProjectKeyPricesImportSinkKeyByImportSinkKeyRequestBuilder {
   constructor(
     protected readonly args: {

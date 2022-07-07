@@ -6,7 +6,8 @@
 import { executeRequest } from '../../shared/utils/common-types'
 import { ByProjectKeyInStoreKeyByStoreKeyProductProjectionsByIDRequestBuilder } from './by-project-key-in-store-key-by-store-key-product-projections-by-id-request-builder'
 import { ByProjectKeyInStoreKeyByStoreKeyProductProjectionsKeyByKeyRequestBuilder } from './by-project-key-in-store-key-by-store-key-product-projections-key-by-key-request-builder'
-
+/**
+ **/
 export class ByProjectKeyInStoreKeyByStoreKeyProductProjectionsRequestBuilder {
   constructor(
     protected readonly args: {

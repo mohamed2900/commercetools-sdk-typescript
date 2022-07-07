@@ -489,7 +489,6 @@ export type TypeUpdateAction =
   | TypeAddLocalizedEnumValueAction
   | TypeChangeEnumValueLabelAction
   | TypeChangeEnumValueOrderAction
-  | TypeChangeFieldDefinitionLabelAction
   | TypeChangeFieldDefinitionOrderAction
   | TypeChangeInputHintAction
   | TypeChangeKeyAction
@@ -584,22 +583,6 @@ export interface TypeChangeEnumValueOrderAction {
    *
    */
   readonly keys: string[]
-}
-export interface TypeChangeFieldDefinitionLabelAction {
-  readonly action: 'changeFieldDefinitionLabel'
-  /**
-   *	`name` of the [FieldDefinition](ctp:api:type:FieldDefinition) to update.
-   *
-   *
-   */
-  readonly fieldName: string
-  /**
-   *	New value to set.
-   *	Must not be empty.
-   *
-   *
-   */
-  readonly label: LocalizedString
 }
 export interface TypeChangeFieldDefinitionOrderAction {
   readonly action: 'changeFieldDefinitionOrder'

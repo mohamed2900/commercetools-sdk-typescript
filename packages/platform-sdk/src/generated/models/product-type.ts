@@ -476,7 +476,6 @@ export type ProductTypeUpdateAction =
   | ProductTypeAddPlainEnumValueAction
   | ProductTypeChangeAttributeConstraintAction
   | ProductTypeChangeAttributeNameAction
-  | ProductTypeChangeAttributeOrderAction
   | ProductTypeChangeAttributeOrderByNameAction
   | ProductTypeChangeDescriptionAction
   | ProductTypeChangeEnumKeyAction
@@ -580,13 +579,6 @@ export interface ProductTypeChangeAttributeNameAction {
    *
    */
   readonly newAttributeName: string
-}
-export interface ProductTypeChangeAttributeOrderAction {
-  readonly action: 'changeAttributeOrder'
-  /**
-   *
-   */
-  readonly attributes: AttributeDefinition[]
 }
 export interface ProductTypeChangeAttributeOrderByNameAction {
   readonly action: 'changeAttributeOrderByName'

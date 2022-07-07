@@ -10,7 +10,9 @@ import {
 import { executeRequest } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyCategoriesImportSinkKeyByImportSinkKeyImportOperationsRequestBuilder } from '../import-operations/by-project-key-categories-import-sink-key-by-import-sink-key-import-operations-request-builder'
-
+/**
+@deprecated
+**/
 export class ByProjectKeyCategoriesImportSinkKeyByImportSinkKeyRequestBuilder {
   constructor(
     protected readonly args: {

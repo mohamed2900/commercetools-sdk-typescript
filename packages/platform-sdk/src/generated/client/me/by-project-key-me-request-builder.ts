@@ -16,7 +16,8 @@ import { ByProjectKeyMePasswordRequestBuilder } from '../password/by-project-key
 import { ByProjectKeyMePaymentsRequestBuilder } from '../payments/by-project-key-me-payments-request-builder'
 import { ByProjectKeyMeShoppingListsRequestBuilder } from '../shopping-lists/by-project-key-me-shopping-lists-request-builder'
 import { ByProjectKeyMeSignupRequestBuilder } from '../signup/by-project-key-me-signup-request-builder'
-
+/**
+ **/
 export class ByProjectKeyMeRequestBuilder {
   constructor(
     protected readonly args: {

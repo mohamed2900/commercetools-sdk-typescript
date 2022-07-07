@@ -6,7 +6,8 @@
 import { executeRequest } from '../../shared/utils/common-types'
 import { ByProjectKeyProductsImportContainersRequestBuilder } from '../import-containers/by-project-key-products-import-containers-request-builder'
 import { ByProjectKeyProductsImportSinkKeyByImportSinkKeyRequestBuilder } from './by-project-key-products-import-sink-key-by-import-sink-key-request-builder'
-
+/**
+ **/
 export class ByProjectKeyProductsRequestBuilder {
   constructor(
     protected readonly args: {
@@ -26,6 +27,10 @@ export class ByProjectKeyProductsRequestBuilder {
       baseUri: this.args.baseUri,
     })
   }
+
+  /**
+   * @deprecated
+   **/
   public importSinkKeyWithImportSinkKeyValue(childPathArgs: {
     importSinkKey: string
   }): ByProjectKeyProductsImportSinkKeyByImportSinkKeyRequestBuilder {

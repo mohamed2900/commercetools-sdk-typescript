@@ -5,7 +5,9 @@
  */
 import { executeRequest } from '../../shared/utils/common-types'
 import { ByProjectKeyImportSummariesImportSinkKeyByImportSinkKeyRequestBuilder } from './by-project-key-import-summaries-import-sink-key-by-import-sink-key-request-builder'
-
+/**
+@deprecated
+**/
 export class ByProjectKeyImportSummariesRequestBuilder {
   constructor(
     protected readonly args: {

@@ -8,7 +8,8 @@ import { ImportOperationPagedResponse } from '../../models/importoperations'
 import { executeRequest, QueryParam } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyPricesImportSinkKeyByImportSinkKeyImportOperationsByIdRequestBuilder } from './by-project-key-prices-import-sink-key-by-import-sink-key-import-operations-by-id-request-builder'
-
+/**
+ **/
 export class ByProjectKeyPricesImportSinkKeyByImportSinkKeyImportOperationsRequestBuilder {
   constructor(
     protected readonly args: {

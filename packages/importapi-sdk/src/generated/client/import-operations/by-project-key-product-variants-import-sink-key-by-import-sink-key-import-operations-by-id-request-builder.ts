@@ -6,7 +6,8 @@
 import { ImportOperation } from '../../models/importoperations'
 import { executeRequest } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
-
+/**
+ **/
 export class ByProjectKeyProductVariantsImportSinkKeyByImportSinkKeyImportOperationsByIdRequestBuilder {
   constructor(
     protected readonly args: {

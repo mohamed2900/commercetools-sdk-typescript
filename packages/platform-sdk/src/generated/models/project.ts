@@ -152,7 +152,6 @@ export type ProjectUpdateAction =
   | ProjectChangeCurrenciesAction
   | ProjectChangeLanguagesAction
   | ProjectChangeMessagesConfigurationAction
-  | ProjectChangeMessagesEnabledAction
   | ProjectChangeNameAction
   | ProjectChangeOrderSearchStatusAction
   | ProjectChangeProductSearchIndexingEnabledAction
@@ -299,13 +298,6 @@ export interface ProjectChangeMessagesConfigurationAction {
    *
    */
   readonly messagesConfiguration: MessagesConfigurationDraft
-}
-export interface ProjectChangeMessagesEnabledAction {
-  readonly action: 'changeMessagesEnabled'
-  /**
-   *
-   */
-  readonly messagesEnabled: boolean
 }
 export interface ProjectChangeNameAction {
   readonly action: 'changeName'

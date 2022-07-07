@@ -7,7 +7,9 @@ import { ImportResponse, OrderImportRequest } from '../../models/importrequests'
 import { executeRequest } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyOrdersImportSinkKeyByImportSinkKeyImportOperationsRequestBuilder } from '../import-operations/by-project-key-orders-import-sink-key-by-import-sink-key-import-operations-request-builder'
-
+/**
+@deprecated
+**/
 export class ByProjectKeyOrdersImportSinkKeyByImportSinkKeyRequestBuilder {
   constructor(
     protected readonly args: {

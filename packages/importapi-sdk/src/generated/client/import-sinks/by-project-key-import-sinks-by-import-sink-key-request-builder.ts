@@ -6,7 +6,8 @@
 import { ImportSink, ImportSinkUpdateDraft } from '../../models/importsinks'
 import { executeRequest } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
-
+/**
+ **/
 export class ByProjectKeyImportSinksByImportSinkKeyRequestBuilder {
   constructor(
     protected readonly args: {

@@ -18,7 +18,8 @@ import { ByProjectKeyProductTypesRequestBuilder } from './product-types/by-proje
 import { ByProjectKeyProductVariantPatchesRequestBuilder } from './product-variant-patches/by-project-key-product-variant-patches-request-builder'
 import { ByProjectKeyProductVariantsRequestBuilder } from './product-variants/by-project-key-product-variants-request-builder'
 import { ByProjectKeyProductsRequestBuilder } from './products/by-project-key-products-request-builder'
-
+/**
+ **/
 export class ByProjectKeyRequestBuilder {
   constructor(
     protected readonly args: {
@@ -29,6 +30,10 @@ export class ByProjectKeyRequestBuilder {
       baseUri?: string
     }
   ) {}
+
+  /**
+   * @deprecated
+   **/
   public importSinks(): ByProjectKeyImportSinksRequestBuilder {
     return new ByProjectKeyImportSinksRequestBuilder({
       pathArgs: {
@@ -38,6 +43,10 @@ export class ByProjectKeyRequestBuilder {
       baseUri: this.args.baseUri,
     })
   }
+
+  /**
+   * @deprecated
+   **/
   public importSummaries(): ByProjectKeyImportSummariesRequestBuilder {
     return new ByProjectKeyImportSummariesRequestBuilder({
       pathArgs: {
