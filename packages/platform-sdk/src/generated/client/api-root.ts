@@ -5,13 +5,14 @@
  */
 import { executeRequest } from '../shared/utils/common-types'
 import { ByProjectKeyRequestBuilder } from './by-project-key-request-builder'
+import {createExecutorFromMiddlewares, Middleware} from "../shared/utils/middleware";
 
 export class ApiRoot {
   private executeRequest: executeRequest
   private baseUri: string
 
-  constructor(args: { executeRequest: executeRequest; baseUri?: string }) {
-    this.executeRequest = args.executeRequest
+  constructor(args: { executeRequest: executeRequest; baseUri?: string, middlewares?: Middleware[] }) {
+    this.executeRequest = createExecutorFromMiddlewares(args.executeRequest, args.middlewares)
     this.baseUri =
       args.baseUri || 'https://api.europe-west1.gcp.commercetools.com'
   }
