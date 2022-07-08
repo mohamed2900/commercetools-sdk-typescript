@@ -6,20 +6,28 @@
 
 import { ProductPublishScope } from './cart'
 import { CategoryReference, CategoryResourceIdentifier } from './category'
+import { ChannelReference, ChannelResourceIdentifier } from './channel'
 import {
   Asset,
   AssetDraft,
   AssetSource,
   BaseResource,
   CreatedBy,
+  DiscountedPrice,
   DiscountedPriceDraft,
   Image,
   LastModifiedBy,
   LocalizedString,
+  Money,
   Price,
-  PriceDraft,
+  PriceTier,
   ScopedPrice,
+  TypedMoney,
 } from './common'
+import {
+  CustomerGroupReference,
+  CustomerGroupResourceIdentifier,
+} from './customer-group'
 import {
   ProductTypeReference,
   ProductTypeResourceIdentifier,
@@ -30,21 +38,158 @@ import {
   TaxCategoryReference,
   TaxCategoryResourceIdentifier,
 } from './tax-category'
-import { FieldContainer, TypeResourceIdentifier } from './type'
+import {
+  CustomFields,
+  CustomFieldsDraft,
+  FieldContainer,
+  TypeResourceIdentifier,
+} from './type'
 
 export interface Attribute {
   /**
+   *	Name of the Attribute.
+   *
    *
    */
   readonly name: string
   /**
-   *	A valid JSON value, based on an AttributeDefinition.
+   *	Valid JSON value based on an [AttributeDefinition](ctp:api:type:AttributeDefinition).
+   *
    *
    */
   readonly value: any
 }
-export interface CategoryOrderHints {
-  [key: string]: string
+/**
+ *	JSON object where the key is a [Category](ctp:api:type:Category) `id` and the value is an order hint: a string representing a number between 0 and 1 that must start with `0.` and cannot end with `0`. Allows controlling the order of Products and how they appear in Categories. Products with no order hint have an order score below `0`. Order hints are non-unique. If a subset of Products have the same value for order hint in a specific category, the behavior is undetermined.
+ *
+ */
+export interface CategoryOrderHints {}
+export interface EmbeddedPrice {
+  /**
+   *	Unique identifier of the EmbeddedPrice.
+   *
+   *
+   */
+  readonly id: string
+  /**
+   *	Money value of the EmbeddedPrice.
+   *
+   *
+   */
+  readonly value: TypedMoney
+  /**
+   *	Country for which the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly country?: string
+  /**
+   *	[CustomerGroup](ctp:api:type:CustomerGroup) for which the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly customerGroup?: CustomerGroupReference
+  /**
+   *	Product distribution [Channel](ctp:api:type:Channel) for which the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly channel?: ChannelReference
+  /**
+   *	Date from which the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly validFrom?: string
+  /**
+   *	Date until the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly validUntil?: string
+  /**
+   *	Price tiers if any are defined.
+   *
+   *
+   */
+  readonly tiers?: PriceTier[]
+  /**
+   *	Set if a matching [ProductDiscount](ctp:api:type:ProductDiscount) exists. If set, the API uses the `discounted` value for the [LineItem Price selection](ctp:api:type:CartLineItemPriceSelection).
+   *	When a [relative Discount](ctp:api:type:ProductDiscountValueRelative) is applied and the fraction part of the `discounted` price is 0.5, the discounted Price is rounded in favor of the customer with the [half down rounding](https://en.wikipedia.org/wiki/Rounding#Round_half_down).
+   *
+   *
+   */
+  readonly discounted?: DiscountedPrice
+  /**
+   *	Custom Fields for the EmbeddedPrice.
+   *
+   *
+   */
+  readonly custom?: CustomFields
+}
+/**
+ *	The representation sent to the server when creating a new EmbeddedPrice.
+ *
+ */
+export interface EmbeddedPriceDraft {
+  /**
+   *	Sets the money value of the EmbeddedPrice.
+   *
+   *
+   */
+  readonly value: Money
+  /**
+   *	Sets the country for which the EmbeddedPrice is valid. If not set, the price is valid for any country.
+   *
+   *
+   */
+  readonly country?: string
+  /**
+   *	Sets the [CustomerGroup](ctp:api:type:CustomerGroup) for which the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly customerGroup?: CustomerGroupResourceIdentifier
+  /**
+   *	Sets the product distribution [Channel](ctp:api:type:Channel) for which the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly channel?: ChannelResourceIdentifier
+  /**
+   *	Sets a discounted Price from an **external service**. Absolute or relative [ProductDiscount](ctp:api:type:ProductDiscount) prices are automatically added to a Product's [EmbeddedPrice](#embeddedprice) when created. The DiscountedPrice must reference a ProductDiscount with:
+   *
+   *	- The `isActive` flag set to `true`.
+   *	- An `external` [ProductDiscountValue](ctp:api:type:ProductDiscountValueExternal).
+   *	- A `predicate` which matches the [ProductVariant](ctp:api:type:ProductVariant) the [EmbeddedPrice](ctp:api:type:EmbeddedPrice) is referenced from.
+   *
+   *
+   */
+  readonly discounted?: DiscountedPriceDraft
+  /**
+   *	Sets the date from which the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly validFrom?: string
+  /**
+   *	Sets the date until the EmbeddedPrice is valid.
+   *
+   *
+   */
+  readonly validUntil?: string
+  /**
+   *	Sets Price tiers.
+   *
+   *
+   */
+  readonly tiers?: PriceTier[]
+  /**
+   *	Custom Fields for the EmbeddedPrice.
+   *
+   *
+   */
+  readonly custom?: CustomFieldsDraft
 }
 export interface FacetRange {
   /**
@@ -121,6 +266,10 @@ export interface FilteredFacetResult {
    */
   readonly productCount?: number
 }
+/**
+ *	A single representation is a combination of the _current_ and _staged_ representations.
+ *
+ */
 export interface Product extends BaseResource {
   /**
    *	Unique identifier of the Product.
@@ -128,223 +277,300 @@ export interface Product extends BaseResource {
    */
   readonly id: string
   /**
-   *	The current version of the product.
+   *	Current version of the Product.
+   *
    *
    */
   readonly version: number
   /**
+   *	Date and time (UTC) the Product was initially created.
+   *
    *
    */
   readonly createdAt: string
   /**
+   *	Date and time (UTC) the Product was last updated.
+   *
    *
    */
   readonly lastModifiedAt: string
   /**
-   *	Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+   *	Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
    *
    *
    */
   readonly lastModifiedBy?: LastModifiedBy
   /**
-   *	Present on resources created after 1 February 2019 except for [events not tracked](/client-logging#events-tracked).
+   *	Present on resources created after 1 February 2019 except for [events not tracked](/../api/client-logging#events-tracked).
    *
    *
    */
   readonly createdBy?: CreatedBy
   /**
    *	User-defined unique identifier of the Product.
-   *	*Product keys are different from ProductVariant keys.*
+   *
+   *	This is different from [ProductVariant](ctp:api:type:ProductVariant) key.
+   *
    *
    */
   readonly key?: string
   /**
+   *	Reference to [ProductType](ctp:api:type:ProductType).
+   *
    *
    */
   readonly productType: ProductTypeReference
   /**
-   *	The product data in the master catalog.
+   *	Product data in the master catalog.
+   *
    *
    */
   readonly masterData: ProductCatalogData
   /**
+   *	Reference to [TaxCategory](ctp:api:type:TaxCategory).
+   *
    *
    */
   readonly taxCategory?: TaxCategoryReference
   /**
+   *	Reference to [State](ctp:api:type:State).
+   *
    *
    */
   readonly state?: StateReference
   /**
-   *	Statistics about the review ratings taken into account for this product.
+   *	Review statistics of the Product.
+   *
    *
    */
   readonly reviewRatingStatistics?: ReviewRatingStatistics
   /**
-   *	Specifies which type of prices should be used when looking up a price for this product. If not set, `Embedded` [ProductPriceMode](ctp:api:type:ProductPriceModeEnum) is used.
+   *	Type of Price to be used when looking up a price for the Product.
+   *
    *
    */
   readonly priceMode?: ProductPriceModeEnum
 }
+/**
+ *	Contains the `current` and `staged` [ProductData](ctp:api:type:ProductData).
+ *
+ */
 export interface ProductCatalogData {
   /**
+   *	Indicates whether the Product is published.
+   *
    *
    */
   readonly published: boolean
   /**
+   *	Current data of the Product.
+   *
    *
    */
   readonly current: ProductData
   /**
+   *	Staged data of the Product.
+   *
    *
    */
   readonly staged: ProductData
   /**
+   *	Indicates whether the staged data is different from the current data.
+   *
    *
    */
   readonly hasStagedChanges: boolean
 }
+/**
+ *	Contains all the data of a Product and its [ProductVariants](ctp:api:type:ProductVariant).
+ *
+ */
 export interface ProductData {
   /**
-   *	JSON object where the keys are of type [Locale](ctp:api:type:Locale), and the values are the strings used for the corresponding language.
+   *	Name of the Product.
    *
    *
    */
   readonly name: LocalizedString
   /**
+   *	Reference to [Categories](ctp:api:type:Category) assigned to the Product.
+   *
    *
    */
   readonly categories: CategoryReference[]
   /**
+   *	Order of Products in Categories.
+   *
    *
    */
   readonly categoryOrderHints?: CategoryOrderHints
   /**
-   *	JSON object where the keys are of type [Locale](ctp:api:type:Locale), and the values are the strings used for the corresponding language.
+   *	Description of the Product.
    *
    *
    */
   readonly description?: LocalizedString
   /**
-   *	JSON object where the keys are of type [Locale](ctp:api:type:Locale), and the values are the strings used for the corresponding language.
+   *	User-defined identifier used in a deep-link URL for the Product.
+   *	Must be unique across a Project, but can be the same for Products in different locales.
+   *	Matches the pattern `[a-zA-Z0-9_\-]{2,256}`.
+   *
+   *	For [good performance](/../api/predicates/query#performance-considerations), indexes are provided for the first 15 `languages` set in the [Project](ctp:api:type:Project).
    *
    *
    */
   readonly slug: LocalizedString
   /**
-   *	JSON object where the keys are of type [Locale](ctp:api:type:Locale), and the values are the strings used for the corresponding language.
+   *	Title of the Product displayed in search results.
    *
    *
    */
   readonly metaTitle?: LocalizedString
   /**
-   *	JSON object where the keys are of type [Locale](ctp:api:type:Locale), and the values are the strings used for the corresponding language.
+   *	Description of the Product displayed in search results below the meta title.
    *
    *
    */
   readonly metaDescription?: LocalizedString
   /**
-   *	JSON object where the keys are of type [Locale](ctp:api:type:Locale), and the values are the strings used for the corresponding language.
+   *	Keywords that give additional information about the Product to search engines.
    *
    *
    */
   readonly metaKeywords?: LocalizedString
   /**
+   *	Master ProductVariant.
+   *
    *
    */
   readonly masterVariant: ProductVariant
   /**
+   *	Related ProductVariants.
+   *
    *
    */
   readonly variants: ProductVariant[]
   /**
+   *	Used by [Product Suggestions](ctp:api:type:ProductSuggestions), but is also considered for a full text search.
+   *
    *
    */
   readonly searchKeywords: SearchKeywords
 }
+/**
+ *	The representation sent to the server when creating a new Product.
+ *
+ */
 export interface ProductDraft {
   /**
-   *	A predefined product type assigned to the product.
-   *	All products must have a product type.
+   *	[ProductType](ctp:api:type:ProductType) of the Product.
+   *
    *
    */
   readonly productType: ProductTypeResourceIdentifier
   /**
+   *	Name of the Product.
+   *
    *
    */
   readonly name: LocalizedString
   /**
-   *	Human-readable identifiers usually used as deep-link URLs for the product.
-   *	A slug must be unique across a project, but a product can have the same slug for different languages.
-   *	Slugs have a maximum size of 256.
-   *	Valid characters are: alphabetic characters (`A-Z, a-z`), numeric characters (`0-9`), underscores (`_`) and hyphens (`-`).
+   *	User-defined identifier used in a deep-link URL for the Product.
+   *	It must be unique across a Project, but a Product can have the same slug in different locales.
+   *	It must match the pattern `[a-zA-Z0-9_\-]{2,256}`.
+   *
    *
    */
   readonly slug: LocalizedString
   /**
    *	User-defined unique identifier for the Product.
    *
+   *
    */
   readonly key?: string
   /**
+   *	Description of the Product.
+   *
    *
    */
   readonly description?: LocalizedString
   /**
-   *	Categories assigned to the product.
+   *	Categories assigned to the Product.
+   *
    *
    */
   readonly categories?: CategoryResourceIdentifier[]
   /**
+   *	Controls the order of Products in Categories.
+   *
    *
    */
   readonly categoryOrderHints?: CategoryOrderHints
   /**
+   *	Title of the Product displayed in search results.
+   *
    *
    */
   readonly metaTitle?: LocalizedString
   /**
+   *	Description of the Product displayed in search results.
+   *
    *
    */
   readonly metaDescription?: LocalizedString
   /**
+   *	Keywords that give additional information about the Product to search engines.
+   *
    *
    */
   readonly metaKeywords?: LocalizedString
   /**
-   *	The master product variant.
-   *	Required if the `variants` array has product variants.
+   *	Master ProductVariant. This field is required if `variants` is not empty.
+   *
    *
    */
   readonly masterVariant?: ProductVariantDraft
   /**
-   *	An array of related product variants.
+   *	ProductVariants of the Product.
+   *
    *
    */
   readonly variants?: ProductVariantDraft[]
   /**
+   *	TaxCategory assigned to the Product.
+   *
    *
    */
   readonly taxCategory?: TaxCategoryResourceIdentifier
   /**
+   *	Used by [Product Suggestions](ctp:api:type:ProductSuggestions), but is also considered for a full text search.
+   *
    *
    */
   readonly searchKeywords?: SearchKeywords
   /**
+   *	State assigned to the Product.
+   *
    *
    */
   readonly state?: StateResourceIdentifier
   /**
-   *	If `true`, the product is published immediately.
+   *	If `true`, the Product is published immediately to the current projection.
+   *
    *
    */
   readonly publish?: boolean
   /**
-   *	Specifies which type of prices should be used when looking up a price for this product. If not set, `Embedded` [ProductPriceMode](ctp:api:type:ProductPriceModeEnum) is used.
+   *	Specifies the type of prices used when looking up a price for the Product.
+   *
    *
    */
   readonly priceMode?: ProductPriceModeEnum
 }
+/**
+ *	[PagedQueryResult](/../api/general-concepts#pagedqueryresult) with `results` containing an array of [Product](ctp:api:type:Product).
+ *
+ */
 export interface ProductPagedQueryResponse {
   /**
    *	Number of [results requested](/../api/general-concepts#limit).
@@ -353,27 +579,36 @@ export interface ProductPagedQueryResponse {
    */
   readonly limit: number
   /**
-   *
-   */
-  readonly count: number
-  /**
-   *
-   */
-  readonly total?: number
-  /**
    *	Number of [elements skipped](/../api/general-concepts#offset).
    *
    *
    */
   readonly offset: number
   /**
+   *	Actual number of results returned.
+   *
+   *
+   */
+  readonly count: number
+  /**
+   *	Total number of results matching the query.
+   *	This number is an estimation that is not [strongly consistent](/../api/general-concepts#strong-consistency).
+   *	This field is returned by default.
+   *	For improved performance, calculating this field can be deactivated by using the query parameter `withTotal=false`.
+   *	When the results are filtered with a [Query Predicate](ctp:api:type:QueryPredicate), `total` is subject to a [limit](/../api/limits#queries).
+   *
+   *
+   */
+  readonly total?: number
+  /**
+   *	[Products](ctp:api:type:Product) matching the query.
+   *
    *
    */
   readonly results: Product[]
 }
 /**
- *
- *	This mode specifies which type of prices should be used when looking up the price of a product.
+ *	This mode determines the type of Prices used for [Product Price Selection](ctp:api:type:ProductPriceSelection) as well as for [LineItem Price selection](ctp:api:type:CartLineItemPriceSelection).
  *
  */
 export type ProductPriceModeEnum = 'Embedded' | 'Standalone'
@@ -540,19 +775,19 @@ export interface ProductReference {
   readonly obj?: Product
 }
 /**
- *	[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Product](ctp:api:type:Product).
+ *	[ResourceIdentifier](ctp:api:type:ResourceIdentifier) to a [Product](ctp:api:type:Product). Either `id` or `key` is required.
  *
  */
 export interface ProductResourceIdentifier {
   readonly typeId: 'product'
   /**
-   *	Unique identifier of the referenced [Product](ctp:api:type:Product). Either `id` or `key` is required.
+   *	Unique identifier of the referenced [Product](ctp:api:type:Product).
    *
    *
    */
   readonly id?: string
   /**
-   *	User-defined unique identifier of the referenced [Product](ctp:api:type:Product). Either `id` or `key` is required.
+   *	User-defined unique identifier of the referenced [Product](ctp:api:type:Product).
    *
    *
    */
@@ -560,10 +795,14 @@ export interface ProductResourceIdentifier {
 }
 export interface ProductUpdate {
   /**
+   *	Expected version of the Product on which the changes should be applied. If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) will be returned.
+   *
    *
    */
   readonly version: number
   /**
+   *	Update actions to be performed on the Product.
+   *
    *
    */
   readonly actions: ProductUpdateAction[]
@@ -616,6 +855,10 @@ export type ProductUpdateAction =
   | ProductSetTaxCategoryAction
   | ProductTransitionStateAction
   | ProductUnpublishAction
+/**
+ *	Represents a single sellable product (often an individual SKU).
+ *
+ */
 export interface ProductVariant {
   /**
    *	A unique, sequential identifier of the ProductVariant within the Product.
@@ -623,113 +866,189 @@ export interface ProductVariant {
    */
   readonly id: number
   /**
+   *	User-defined unique SKU of the ProductVariant.
+   *
    *
    */
   readonly sku?: string
   /**
    *	User-defined unique identifier of the ProductVariant.
-   *	*ProductVariant keys are different from Product keys.*
+   *
+   *	This is different from [Product](ctp:api:type:Product) key.
    *
    *
    */
   readonly key?: string
   /**
+   *	EmbeddedPrices of the ProductVariant.
+   *	Cannot contain two Prices of the same Price scope (with same currency, country, Customer Group, and Channel).
+   *
    *
    */
-  readonly prices?: Price[]
+  readonly prices?: EmbeddedPrice[]
   /**
+   *	Attributes of the ProductVariant.
+   *
    *
    */
   readonly attributes?: Attribute[]
   /**
+   *	Only available when [Price selection](#price-selection) is used.
+   *	Cannot be used in a [Query Predicate](ctp:api:type:QueryPredicate).
+   *
    *
    */
   readonly price?: Price
   /**
+   *	Images of the ProductVariant.
+   *
    *
    */
   readonly images?: Image[]
   /**
+   *	Media assets of the ProductVariant.
+   *
    *
    */
   readonly assets?: Asset[]
   /**
+   *	Set if the ProductVariant is tracked by Inventory. Can be used as an optimization to reduce calls to the Inventory service. May not contain the latest Inventory State (it is [eventually consistent](/general-concepts#eventual-consistency)).
+   *
    *
    */
   readonly availability?: ProductVariantAvailability
   /**
+   *	Only available in response to a [Product Projection Search](ctp:api:type:ProductProjectionSearch) request to mark this ProductVariant as one that matches the search query.
+   *
    *
    */
   readonly isMatchingVariant?: boolean
   /**
+   *	Only available in response to a [Product Projection Search](ctp:api:type:ProductProjectionSearch) request with [price selection](ctp:api:type:ProductPriceSelection).
+   *	Can be used to sort, [filter](ctp:api:type:ProductProjectionSearchFilterScopedPrice), and facet.
+   *
    *
    */
   readonly scopedPrice?: ScopedPrice
   /**
+   *	Only available in response to a [Product Projection Search](ctp:api:type:ProductProjectionSearch) request with [price selection](ctp:api:type:ProductPriceSelection).
+   *
    *
    */
   readonly scopedPriceDiscounted?: boolean
 }
+/**
+ *	The [InventoryEntry](ctp:api:type:InventoryEntry) information of the [ProductVariant](ctp:api:type:ProductVariant). If there is a supply [Channel](ctp:api:type:Channel) for the InventoryEntry, then `channels` is returned. If not, then `isOnStock`, `restockableInDays`, and `quantityOnStock` are returned.
+ *
+ */
 export interface ProductVariantAvailability {
   /**
+   *	For each [InventoryEntry](ctp:api:type:InventoryEntry) with a supply Channel, an entry is added to `channels`.
    *
-   */
-  readonly isOnStock?: boolean
-  /**
-   *
-   */
-  readonly restockableInDays?: number
-  /**
-   *
-   */
-  readonly availableQuantity?: number
-  /**
    *
    */
   readonly channels?: ProductVariantChannelAvailabilityMap
-}
-export interface ProductVariantChannelAvailability {
   /**
+   *	Indicates whether a [ProductVariant](ctp:api:type:ProductVariant) is in stock.
+   *
    *
    */
   readonly isOnStock?: boolean
   /**
+   *	Number of days to restock a [ProductVariant](ctp:api:type:ProductVariant) once it is out of stock.
+   *
    *
    */
   readonly restockableInDays?: number
   /**
+   *	Number of items of the [ProductVariant](ctp:api:type:ProductVariant) that are in stock.
+   *
    *
    */
   readonly availableQuantity?: number
 }
-export interface ProductVariantChannelAvailabilityMap {
-  [key: string]: ProductVariantChannelAvailability
+export interface ProductVariantChannelAvailability {
+  /**
+   *	Indicates whether a [ProductVariant](ctp:api:type:ProductVariant) is in stock in a specified [Channel](ctp:api:type:Channel).
+   *
+   *
+   */
+  readonly isOnStock?: boolean
+  /**
+   *	Number of days to restock a [ProductVariant](ctp:api:type:ProductVariant) once it is out of stock in a specified [Channel](ctp:api:type:Channel).
+   *
+   *
+   */
+  readonly restockableInDays?: number
+  /**
+   *	Number of items of this [ProductVariant](ctp:api:type:ProductVariant) that are in stock in a specified [Channel](ctp:api:type:Channel).
+   *
+   *
+   */
+  readonly availableQuantity?: number
+  /**
+   *	Unique identifier of the [InventoryEntry](ctp:api:type:InventoryEntry).
+   *
+   *
+   */
+  readonly id: string
+  /**
+   *	Current version of the [InventoryEntry](ctp:api:type:InventoryEntry).
+   *
+   *
+   */
+  readonly version: number
 }
+/**
+ *	JSON object where the key is a supply [Channel](ctp:api:type:Channel) `id` and the value is the [ProductVariantChannelAvailability](ctp:api:type:ProductVariantChannelAvailability) of the [InventoryEntry](ctp:api:type:InventoryEntry).
+ *
+ */
+export interface ProductVariantChannelAvailabilityMap {}
+/**
+ *	Creates a ProductVariant when included in the `masterVariant` and `variants` fields of the [ProductDraft](ctp:api:type:ProductDraft).
+ *
+ */
 export interface ProductVariantDraft {
   /**
+   *	User-defined unique SKU of the ProductVariant.
+   *
    *
    */
   readonly sku?: string
   /**
    *	User-defined unique identifier for the ProductVariant.
-   *	*ProductVariant keys are different from Product keys.*
    *
    *
    */
   readonly key?: string
   /**
+   *	EmbeddedPrices for the ProductVariant.
+   *
    *
    */
-  readonly prices?: PriceDraft[]
+  readonly prices?: EmbeddedPriceDraft[]
   /**
+   *	[AttributeType](ctp:api:type:AttributeType) determines the format of the Attribute `value` to be provided:
+   *
+   *	- For [AttributeEnumType](ctp:api:type:AttributeEnumType) and [AttributeLocalizedEnumType](ctp:api:type:AttributeLocalizedEnumType) Attributes, use the `key` of the [AttributePlainEnumValue](ctp:api:type:AttributePlainEnumValue) or [AttributeLocalizedEnumValue](ctp:api:type:AttributeLocalizedEnumValue) objects, or the complete objects as `value`.
+   *	- For [AttributeLocalizableTextType](ctp:api:type:AttributeLocalizableTextType) Attributes, use the [LocalizedString](ctp:api:type:LocalizedString) object as `value`.
+   *	- For [AttributeMoneyType](ctp:api:type:AttributeMoneyType) Attributes, use the [Money](ctp:api:type:Money) object as `value`.
+   *	- For [AttributeSetType](ctp:api:type:AttributeSetType) Attributes, use the entire `set` object  as `value`.
+   *	- For [AttributeNestedType](ctp:api:type:AttributeNestedType) Attributes, use the list of values of all Attributes of the nested Product as `value`.
+   *	- For [AttributeReferenceType](ctp:api:type:AttributeReferenceType) Attributes, use the [Reference](ctp:api:type:Reference) object as `value`.
+   *
    *
    */
   readonly attributes?: Attribute[]
   /**
+   *	Images for the ProductVariant.
+   *
    *
    */
   readonly images?: Image[]
   /**
+   *	Media assets for the ProductVariant.
+   *
    *
    */
   readonly assets?: AssetDraft[]
@@ -743,21 +1062,33 @@ export interface RangeFacetResult {
 }
 export interface SearchKeyword {
   /**
+   *	Text to return in the result of a [suggest query](ctp:api:type:ProductSuggestionsSuggestQuery).
+   *
    *
    */
   readonly text: string
   /**
+   *	If no tokenizer is defined, the `text` is used as a single token.
+   *
    *
    */
   readonly suggestTokenizer?: SuggestTokenizer
 }
-export interface SearchKeywords {
-  [key: string]: SearchKeyword[]
-}
+/**
+ *	Search keywords are JSON objects primarily used by [Product Suggestions](ctp:api:type:ProductSuggestions), but are also considered for a full text search. The keys are of type [Locale](ctp:api:type:Locale), and the values are an array of [SearchKeyword](ctp:api:type:SearchKeyword).
+ *
+ */
+export interface SearchKeywords {}
 export type SuggestTokenizer = CustomTokenizer | WhitespaceTokenizer
+/**
+ *	Define arbitrary tokens that are used to match the input.
+ *
+ */
 export interface CustomTokenizer {
   readonly type: 'custom'
   /**
+   *	Contains custom tokens.
+   *
    *
    */
   readonly inputs: string[]
@@ -802,82 +1133,132 @@ export type TermFacetResultType =
   | 'number'
   | 'text'
   | 'time'
+/**
+ *	Creates tokens by splitting the `text` field in [SearchKeyword](ctp:api:type:SearchKeyword) by whitespaces.
+ *
+ */
 export interface WhitespaceTokenizer {
   readonly type: 'whitespace'
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductAddAssetAction {
   readonly action: 'addAsset'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged `assets` are updated. If `false`, both the current and staged `assets` are updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	Value to append.
+   *
    *
    */
   readonly asset: AssetDraft
   /**
-   *	Position of the new asset inside the existing list (from `0` to the size of the list)
+   *	Position in `assets` where the Asset should be put. When specified, the value must be between `0` and the total number of Assets minus `1`.
+   *
    *
    */
   readonly position?: number
 }
+/**
+ *	Either `variantId` or `sku` is required. Produces the [ProductImageAddedMessage](ctp:api:type:ProductImageAddedMessage).
+ *
+ */
 export interface ProductAddExternalImageAction {
   readonly action: 'addExternalImage'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	Value to add to `images`.
+   *
    *
    */
   readonly image: Image
   /**
+   *	If `true`, only the staged `images` is updated. If `false`, both the current and staged `images` is updated.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductAddPriceAction {
   readonly action: 'addPrice'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	EmbeddedPrice to add to the ProductVariant.
+   *
    *
    */
-  readonly price: PriceDraft
+  readonly price: EmbeddedPriceDraft
   /**
+   *	If `true`, only the staged `prices` is updated. If `false`, both the current and staged `prices` are updated.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Produces the [ProductAddedToCategoryMessage](ctp:api:type:ProductAddedToCategoryMessage).
+ */
 export interface ProductAddToCategoryAction {
   readonly action: 'addToCategory'
   /**
+   *	ResourceIdentifier of the Category to add.
+   *
    *
    */
   readonly category: CategoryResourceIdentifier
   /**
+   *	A String representing a number between 0 and 1. Must start with `0.` and cannot end with `0`. If empty, any existing value will be removed.
+   *
    *
    */
   readonly orderHint?: string
   /**
+   *	If `true`, only the staged `categories` and `categoryOrderHints` are updated. If `false`, both the current and staged `categories` and `categoryOrderHints` are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -885,91 +1266,142 @@ export interface ProductAddToCategoryAction {
 export interface ProductAddVariantAction {
   readonly action: 'addVariant'
   /**
+   *	Value to set. Must be unique.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	Value to set. Must be unique.
+   *
    *
    */
   readonly key?: string
   /**
+   *	EmbeddedPrices for the ProductVariant.
+   *
    *
    */
-  readonly prices?: PriceDraft[]
+  readonly prices?: EmbeddedPriceDraft[]
   /**
+   *	Images for the ProductVariant.
+   *
    *
    */
   readonly images?: Image[]
   /**
+   *	Attributes for the ProductVariant.
    *
    */
   readonly attributes?: Attribute[]
   /**
+   *	If `true` the new ProductVariant is only staged. If `false` the new ProductVariant is both current and staged.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	Media assets for the ProductVariant.
+   *
    *
    */
   readonly assets?: Asset[]
 }
+/**
+ *	Either `variantId` or `sku` is required. The Asset to update must be specified using either `assetId` or `assetKey`.
+ *
+ */
 export interface ProductChangeAssetNameAction {
   readonly action: 'changeAssetName'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is updated. If `false`, both the current and staged Asset is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to update.
+   *
    *
    */
   readonly assetId?: string
   /**
+   *	The `key` of the Asset to update.
+   *
    *
    */
   readonly assetKey?: string
   /**
+   *	New value to set. Must not be empty.
+   *
    *
    */
   readonly name: LocalizedString
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductChangeAssetOrderAction {
   readonly action: 'changeAssetOrder'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged `assets` is updated. If `false`, both the current and staged `assets` are updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	All existing Asset `id`s of the ProductVariant in the desired new order.
+   *
    *
    */
   readonly assetOrder: string[]
 }
+/**
+ *	Either `variantId` or `sku` is required. The specified Product Variant is removed from `variants` and the current Master Variant is moved to `variants`.
+ *
+ */
 export interface ProductChangeMasterVariantAction {
   readonly action: 'changeMasterVariant'
   /**
+   *	The `id` of the ProductVariant to become the Master Variant.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to become the Master Variant.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Master Variant is changed. If `false`, both the current and staged Master Variant are changed.
+   *
    *
    */
   readonly staged?: boolean
@@ -977,10 +1409,14 @@ export interface ProductChangeMasterVariantAction {
 export interface ProductChangeNameAction {
   readonly action: 'changeName'
   /**
+   *	Value to set. Must not be empty.
+   *
    *
    */
   readonly name: LocalizedString
   /**
+   *	If `true`, only the staged `name` is updated. If `false`, both the current and staged `name` are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -988,29 +1424,38 @@ export interface ProductChangeNameAction {
 export interface ProductChangePriceAction {
   readonly action: 'changePrice'
   /**
-   *	ID of the [EmbeddedPrice](ctp:api:type:EmbeddedPrice)
+   *	The `id` of the EmbeddedPrice to update.
+   *
    *
    */
   readonly priceId: string
   /**
+   *	Value to set.
+   *
    *
    */
-  readonly price: PriceDraft
+  readonly price: EmbeddedPriceDraft
   /**
+   *	If `true`, only the staged EmbeddedPrice is updated. If `false`, both the current and staged EmbeddedPrice are updated.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Produces the [ProductSlugChangedMessage](ctp:api:type:ProductSlugChangedMessage).
+ */
 export interface ProductChangeSlugAction {
   readonly action: 'changeSlug'
   /**
-   *	Every slug must be unique across a project, but a product can have the same slug for different languages.
-   *	Allowed are alphabetic, numeric, underscore (`_`) and hyphen (`-`) characters.
-   *	Maximum size is `256`.
+   *	Value to set. Must not be empty. A Product can have the same slug for different [Locales](ctp:api:type:Locale), but it must be unique across the [Project](ctp:api:type:Project). Must match the pattern `^[A-Za-z0-9_-]{2,256}+$`.
+   *
    *
    */
   readonly slug: LocalizedString
   /**
+   *	If `true`, only the staged `slug` is updated. If `false`, both the current and staged `slug` are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -1026,87 +1471,137 @@ export interface ProductLegacySetSkuAction {
    */
   readonly variantId: number
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductMoveImageToPositionAction {
   readonly action: 'moveImageToPosition'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
-   *	The URL of the image
+   *	The URL of the image to update.
+   *
    *
    */
   readonly imageUrl: string
   /**
+   *	Position in `images` where the image should be moved. Must be between `0` and the total number of images minus `1`.
+   *
    *
    */
   readonly position: number
   /**
+   *	If `true`, only the staged `images` is updated. If `false`, both the current and staged `images` is updated.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Produces the [ProductPublishedMessage](ctp:api:type:ProductPublishedMessage).
+ */
 export interface ProductPublishAction {
   readonly action: 'publish'
   /**
+   *	`All` or `Prices`
+   *
    *
    */
   readonly scope?: ProductPublishScope
 }
+/**
+ *	Either `variantId` or `sku` is required. The Asset to remove must be specified using either `assetId` or `assetKey`.
+ *
+ */
 export interface ProductRemoveAssetAction {
   readonly action: 'removeAsset'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is removed. If `false`, both the current and staged Asset is removed.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to remove.
+   *
    *
    */
   readonly assetId?: string
   /**
+   *	The `key` of the Asset to remove.
+   *
    *
    */
   readonly assetKey?: string
 }
+/**
+ *	Produces the [ProductRemovedFromCategoryMessage](ctp:api:type:ProductRemovedFromCategoryMessage).
+ */
 export interface ProductRemoveFromCategoryAction {
   readonly action: 'removeFromCategory'
   /**
+   *	ResourceIdentifier of the Category to remove.
+   *
    *
    */
   readonly category: CategoryResourceIdentifier
   /**
+   *	If `true`, only the staged `categories` and `categoryOrderHints` are removed. If `false`, both the current and staged `categories` and `categoryOrderHints` are removed.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Removes a Product image and deletes it from the Content Delivery Network (external images are not deleted). Deletion from the CDN is not instant, which means the image file itself will stay available for some time after the deletion. Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductRemoveImageAction {
   readonly action: 'removeImage'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
-   *	The URL of the image.
+   *	The URL of the image to remove.
+   *
    *
    */
   readonly imageUrl: string
   /**
+   *	If `true`, only the staged image is removed. If `false`, both the current and staged image is removed.
+   *
    *
    */
   readonly staged?: boolean
@@ -1114,59 +1609,96 @@ export interface ProductRemoveImageAction {
 export interface ProductRemovePriceAction {
   readonly action: 'removePrice'
   /**
-   *	ID of the [EmbeddedPrice](ctp:api:type:EmbeddedPrice)
+   *	The `id` of the EmbeddedPrice to remove.
+   *
    *
    */
   readonly priceId: string
   /**
+   *	If `true`, only the staged EmbeddedPrice is removed. If `false`, both the current and staged EmbeddedPrice are removed.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Either `id` or `sku` is required. Produces the [ProductVariantDeletedMessage](ctp:api:type:ProductVariantDeletedMessage).
+ *
+ */
 export interface ProductRemoveVariantAction {
   readonly action: 'removeVariant'
   /**
+   *	The `id` of the ProductVariant to remove.
+   *
    *
    */
   readonly id?: number
   /**
+   *	The `sku` of the ProductVariant to remove.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged ProductVariant is removed. If `false`, both the current and staged ProductVariant is removed.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Reverts the staged version of a Product to the current version. Produces the [ProductRevertedStagedChangesMessage](ctp:api:type:ProductRevertedStagedChangesMessage).
+ *
+ */
 export interface ProductRevertStagedChangesAction {
   readonly action: 'revertStagedChanges'
 }
+/**
+ *	Reverts the staged version of a ProductVariant to the current version.
+ *
+ */
 export interface ProductRevertStagedVariantChangesAction {
   readonly action: 'revertStagedVariantChanges'
   /**
+   *	The `id` of the ProductVariant to revert.
+   *
    *
    */
   readonly variantId: number
 }
+/**
+ *	Either `variantId` or `sku` is required. The [Asset](ctp:api:type:Asset) to update must be specified using either `assetId` or `assetKey`.
+ *
+ */
 export interface ProductSetAssetCustomFieldAction {
   readonly action: 'setAssetCustomField'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is updated. If `false`, both the current and staged Asset is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to update.
+   *
    *
    */
   readonly assetId?: string
   /**
+   *	The `key` of the Asset to update.
+   *
    *
    */
   readonly assetKey?: string
@@ -1185,25 +1717,39 @@ export interface ProductSetAssetCustomFieldAction {
    */
   readonly value?: any
 }
+/**
+ *	Either `variantId` or `sku` is required. The [Asset](ctp:api:type:Asset) to update must be specified using either `assetId` or `assetKey`.
+ *
+ */
 export interface ProductSetAssetCustomTypeAction {
   readonly action: 'setAssetCustomType'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is updated. If `false`, both the current and staged Asset is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to update.
+   *
    *
    */
   readonly assetId?: string
   /**
+   *	The `key` of the Asset to update.
+   *
    *
    */
   readonly assetKey?: string
@@ -1221,134 +1767,205 @@ export interface ProductSetAssetCustomTypeAction {
    */
   readonly fields?: FieldContainer
 }
+/**
+ *	Either `variantId` or `sku` is required. The [Asset](ctp:api:type:Asset) to update must be specified using either `assetId` or `assetKey`.
+ *
+ */
 export interface ProductSetAssetDescriptionAction {
   readonly action: 'setAssetDescription'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is updated. If `false`, both the current and staged Asset is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to update.
+   *
    *
    */
   readonly assetId?: string
   /**
+   *	The `key` of the Asset to update.
+   *
    *
    */
   readonly assetKey?: string
   /**
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly description?: LocalizedString
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductSetAssetKeyAction {
   readonly action: 'setAssetKey'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is updated. If `false`, both the current and staged Asset is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to update.
+   *
    *
    */
   readonly assetId: string
   /**
-   *	User-defined identifier for the asset.
-   *	If left blank or set to `null`, the asset key is unset/removed.
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly assetKey?: string
 }
+/**
+ *	Either `variantId` or `sku` is required. The [Asset](ctp:api:type:Asset) to update must be specified using either `assetId` or `assetKey`.
+ *
+ */
 export interface ProductSetAssetSourcesAction {
   readonly action: 'setAssetSources'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is updated. If `false` both the current and staged Asset is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to update.
+   *
    *
    */
   readonly assetId?: string
   /**
+   *	The `key` of the Asset to update.
+   *
    *
    */
   readonly assetKey?: string
   /**
+   *	Value to set.
+   *
    *
    */
   readonly sources: AssetSource[]
 }
+/**
+ *	Either `variantId` or `sku` is required. The Asset to update must be specified using either `assetId` or `assetKey`.
+ *
+ */
 export interface ProductSetAssetTagsAction {
   readonly action: 'setAssetTags'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged Asset is updated. If `false`, both the current and staged Asset is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	The `id` of the Asset to update.
+   *
    *
    */
   readonly assetId?: string
   /**
+   *	The `key` of the Asset to update.
+   *
    *
    */
   readonly assetKey?: string
   /**
+   *	Keywords for categorizing and organizing Assets.
+   *
    *
    */
   readonly tags?: string[]
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductSetAttributeAction {
   readonly action: 'setAttribute'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	The name of the Attribute to set.
+   *
    *
    */
   readonly name: string
   /**
-   *	If the attribute exists and the value is omitted or set to `null`, the attribute is removed.
-   *	If the attribute exists and a value is provided, the new value is applied.
-   *	If the attribute does not exist and a value is provided, it is added as a new attribute.
+   *	Value to set for the Attribute. If empty, any existing value will be removed.
+   *
    *
    */
   readonly value?: any
   /**
+   *	If `true`, only the staged Attribute is set. If `false`, both current and staged Attribute is set.
+   *
    *
    */
   readonly staged?: boolean
@@ -1356,15 +1973,20 @@ export interface ProductSetAttributeAction {
 export interface ProductSetAttributeInAllVariantsAction {
   readonly action: 'setAttributeInAllVariants'
   /**
+   *	The name of the Attribute to set.
+   *
    *
    */
   readonly name: string
   /**
-   *	The same update behavior as for Set Attribute applies.
+   *	Value to set for the Attributes. If empty, any existing value will be removed.
+   *
    *
    */
   readonly value?: any
   /**
+   *	If `true`, only the staged Attributes are set. If `false`, both the current and staged Attributes are set.
+   *
    *
    */
   readonly staged?: boolean
@@ -1372,14 +1994,20 @@ export interface ProductSetAttributeInAllVariantsAction {
 export interface ProductSetCategoryOrderHintAction {
   readonly action: 'setCategoryOrderHint'
   /**
+   *	The `id` of the Category to add the `orderHint`.
+   *
    *
    */
   readonly categoryId: string
   /**
+   *	A String representing a number between 0 and 1. Must start with `0.` and cannot end with `0`. If empty, any existing value will be removed.
+   *
    *
    */
   readonly orderHint?: string
   /**
+   *	If `true`, only the staged `categoryOrderHints` is updated. If `false`, both the current and staged `categoryOrderHints` are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -1387,51 +2015,76 @@ export interface ProductSetCategoryOrderHintAction {
 export interface ProductSetDescriptionAction {
   readonly action: 'setDescription'
   /**
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly description?: LocalizedString
   /**
+   *	If `true`, only the staged `description` is updated. If `false`, both the current and staged `description` are updated.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Produces the [ProductPriceExternalDiscountSetMessage](ctp:api:type:ProductPriceExternalDiscountSetMessage).
+ *
+ */
 export interface ProductSetDiscountedPriceAction {
   readonly action: 'setDiscountedPrice'
   /**
+   *	The `id` of the EmbeddedPrice to set the Discount.
+   *
    *
    */
   readonly priceId: string
   /**
+   *	If `true`, only the staged EmbeddedPrice is updated. If `false`, both the current and staged EmbeddedPrice are updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
+   *	Value to set. The referenced [ProductDiscount](ctp:api:type:ProductDiscount) must have the Type `external`, be active, and its predicate must match the referenced Price.
+   *
    *
    */
   readonly discounted?: DiscountedPriceDraft
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductSetImageLabelAction {
   readonly action: 'setImageLabel'
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
-   *	The URL of the image.
+   *	The URL of the image to set the label.
+   *
    *
    */
   readonly imageUrl: string
   /**
-   *	The new image label.
-   *	If left blank or set to null, the label is removed.
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly label?: string
   /**
+   *	If `true`, only the staged image is updated. If `false`, both the current and staged image is updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -1439,8 +2092,8 @@ export interface ProductSetImageLabelAction {
 export interface ProductSetKeyAction {
   readonly action: 'setKey'
   /**
-   *	User-specific unique identifier for the product.
-   *	If left blank or set to `null`, the product key is unset/removed.
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly key?: string
@@ -1448,10 +2101,14 @@ export interface ProductSetKeyAction {
 export interface ProductSetMetaDescriptionAction {
   readonly action: 'setMetaDescription'
   /**
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly metaDescription?: LocalizedString
   /**
+   *	If `true`, only the staged `metaDescription` is updated. If `false`, both the current and staged `metaDescription` are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -1459,10 +2116,14 @@ export interface ProductSetMetaDescriptionAction {
 export interface ProductSetMetaKeywordsAction {
   readonly action: 'setMetaKeywords'
   /**
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly metaKeywords?: LocalizedString
   /**
+   *	If `true`, only the staged `metaKeywords` is updated. If `false`, both the current and staged `metaKeywords` are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -1470,10 +2131,14 @@ export interface ProductSetMetaKeywordsAction {
 export interface ProductSetMetaTitleAction {
   readonly action: 'setMetaTitle'
   /**
+   *	Value to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly metaTitle?: LocalizedString
   /**
+   *	If `true`, only the staged `metaTitle` is updated. If `false`, both the current and staged `metaTitle` are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -1481,26 +2146,39 @@ export interface ProductSetMetaTitleAction {
 export interface ProductSetPriceModeAction {
   readonly action: 'setPriceMode'
   /**
-   *	Specifies which type of prices should be used when looking up a price for this product. If not set, `Embedded` [ProductPriceMode](ctp:api:type:ProductPriceModeEnum) is used.
+   *	Specifies which type of Prices should be used when looking up a price for the Product.
+   *
    *
    */
   readonly priceMode?: ProductPriceModeEnum
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductSetPricesAction {
   readonly action: 'setPrices'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	The EmbeddedPrices to set.
+   *
    *
    */
-  readonly prices: PriceDraft[]
+  readonly prices: EmbeddedPriceDraft[]
   /**
+   *	If `true`, only the staged ProductVariant is updated. If `false`, both the current and staged ProductVariant are updated.
+   *
    *
    */
   readonly staged?: boolean
@@ -1508,22 +2186,26 @@ export interface ProductSetPricesAction {
 export interface ProductSetProductPriceCustomFieldAction {
   readonly action: 'setProductPriceCustomField'
   /**
+   *	The `id` of the Embedded Price to update.
+   *
    *
    */
   readonly priceId: string
   /**
+   *	If `true`, only the staged Embedded Price Custom Field is updated. If `false`, both the current and staged Embedded Price Custom Field are updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
-   *	Name of the [Custom Field](/../api/projects/custom-fields).
+   *	Name of the [Custom Field](ctp:api:type:CustomField).
    *
    *
    */
   readonly name: string
   /**
    *	If `value` is absent or `null`, this field will be removed if it exists.
-   *	Trying to remove a field that does not exist will fail with an [InvalidOperation](/../api/errors#general-400-invalid-operation) error.
+   *	Trying to remove a field that does not exist will fail with an [InvalidOperation](ctp:api:type:InvalidOperationError) error.
    *	If `value` is provided, it is set for the field defined by `name`.
    *
    *
@@ -1533,43 +2215,58 @@ export interface ProductSetProductPriceCustomFieldAction {
 export interface ProductSetProductPriceCustomTypeAction {
   readonly action: 'setProductPriceCustomType'
   /**
+   *	The `id` of the Embedded Price to update.
+   *
    *
    */
   readonly priceId: string
   /**
+   *	If `true`, only the staged Embedded Price is updated. If `false`, both the current and staged Embedded Price is updated.
+   *
    *
    */
   readonly staged?: boolean
   /**
    *	Defines the [Type](ctp:api:type:Type) that extends the Price with [Custom Fields](/../api/projects/custom-fields).
-   *	If absent, any existing Type and Custom Fields are removed from the Price.
+   *	If absent, any existing Type and Custom Fields are removed from the Embedded Price.
    *
    *
    */
   readonly type?: TypeResourceIdentifier
   /**
-   *	Sets the [Custom Fields](/../api/projects/custom-fields) fields for the Price.
+   *	Sets the [Custom Fields](/../api/projects/custom-fields) fields for the Embedded Price.
    *
    *
    */
   readonly fields?: FieldContainer
 }
+/**
+ *	Either `variantId` or `sku` is required.
+ *
+ */
 export interface ProductSetProductVariantKeyAction {
   readonly action: 'setProductVariantKey'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId?: number
   /**
+   *	The `sku` of the ProductVariant to update.
+   *
    *
    */
   readonly sku?: string
   /**
-   *	If left blank or set to `null`, the key is unset/removed.
+   *	Value to set. Must be unique. If empty, any existing value will be removed.
+   *
    *
    */
   readonly key?: string
   /**
+   *	If `true`, only the staged `key` is set. If `false`, both the current and staged `key` are set.
+   *
    *
    */
   readonly staged?: boolean
@@ -1577,50 +2274,79 @@ export interface ProductSetProductVariantKeyAction {
 export interface ProductSetSearchKeywordsAction {
   readonly action: 'setSearchKeywords'
   /**
+   *	Value to set.
+   *
    *
    */
   readonly searchKeywords: SearchKeywords
   /**
+   *	If `true`, only the staged `searchKeywords` is updated. If `false`, both the current and staged `searchKeywords` are updated.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	SKU cannot be changed or removed if it is associated with an [InventoryEntry](ctp:api:type:InventoryEntry).
+ *
+ */
 export interface ProductSetSkuAction {
   readonly action: 'setSku'
   /**
+   *	The `id` of the ProductVariant to update.
+   *
    *
    */
   readonly variantId: number
   /**
-   *	SKU must be unique.
-   *	If left blank or set to `null`, the sku is unset/removed.
+   *	Value to set. Must be unique. If empty, any existing value will be removed.
+   *
    *
    */
   readonly sku?: string
   /**
+   *	If `true`, only the staged `sku` is updated. If `false`, both the current and staged `sku` are updated.
+   *
    *
    */
   readonly staged?: boolean
 }
+/**
+ *	Cannot be staged. Published Products are immediately updated.
+ *
+ */
 export interface ProductSetTaxCategoryAction {
   readonly action: 'setTaxCategory'
   /**
-   *	If left blank or set to `null`, the tax category is unset/removed.
+   *	ResourceIdentifier of the Tax Category to set. If empty, any existing value will be removed.
+   *
    *
    */
   readonly taxCategory?: TaxCategoryResourceIdentifier
 }
+/**
+ *	If the existing [State](ctp:api:type:State) has set `transitions`, there must be a direct transition to the new State. If `transitions` is not set, no validation is performed. Produces the [ProductStateTransitionMessage](ctp:api:type:ProductStateTransitionMessage).
+ *
+ */
 export interface ProductTransitionStateAction {
   readonly action: 'transitionState'
   /**
+   *	ResourceIdentifier of the State to transition to. If there is no existing State, this must be an initial State.
+   *
    *
    */
   readonly state?: StateResourceIdentifier
   /**
+   *	If `true`, validations are disabled.
+   *
    *
    */
   readonly force?: boolean
 }
+/**
+ *	Removes the current projection of the Product. The staged projection is unaffected. Unpublished Products only appear in query/search results with `staged=false`. Produces the [ProductUnpublishedMessage](ctp:api:type:ProductUnpublishedMessage).
+ *
+ */
 export interface ProductUnpublishAction {
   readonly action: 'unpublish'
 }

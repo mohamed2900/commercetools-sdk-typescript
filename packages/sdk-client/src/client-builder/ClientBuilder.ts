@@ -1,16 +1,17 @@
 import fetch from 'node-fetch'
 import { default as createClient } from '../sdk-client/client'
 import * as authMiddlewares from '../sdk-middleware-auth'
+import { default as createConcurrentModificationMiddleware } from '../sdk-middleware-concurrent-modification/concurrent-modification'
 import { default as createCorrelationIdMiddleware } from '../sdk-middleware-correlation-id/correlation-id'
 import { default as createHttpMiddleware } from '../sdk-middleware-http/http'
 import { default as createLoggerMiddleware } from '../sdk-middleware-logger/logger'
 import { default as createQueueMiddleware } from '../sdk-middleware-queue/queue'
 import { default as createUserAgentMiddleware } from '../sdk-middleware-user-agent/user-agent'
-import { default as createConcurrentModificationMiddleware } from '../sdk-middleware-concurrent-modification/concurrent-modification'
 import {
   AnonymousAuthMiddlewareOptions,
   AuthMiddlewareOptions,
   Client,
+  ConcurrentModificationMiddlewareOptions,
   CorrelationIdMiddlewareOptions,
   Credentials,
   ExistingTokenMiddlewareOptions,
@@ -21,7 +22,6 @@ import {
   PasswordAuthMiddlewareOptions,
   QueueMiddlewareOptions,
   RefreshAuthMiddlewareOptions,
-  ConcurrentModificationMiddlewareOptions,
 } from '../types/sdk'
 
 const {

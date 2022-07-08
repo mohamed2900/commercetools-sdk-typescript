@@ -8,7 +8,8 @@ import { executeRequest, QueryParam } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyProductsByIDImagesRequestBuilder } from '../images/by-project-key-products-by-id-images-request-builder'
 import { ByProjectKeyProductsByIDProductSelectionsRequestBuilder } from '../product-selections/by-project-key-products-by-id-product-selections-request-builder'
-
+/**
+ **/
 export class ByProjectKeyProductsByIDRequestBuilder {
   constructor(
     protected readonly args: {
@@ -39,9 +40,6 @@ export class ByProjectKeyProductsByIDRequestBuilder {
     })
   }
 
-  /**
-   *	Gets the full representation of a product by ID.
-   */
   public get(methodArgs?: {
     queryArgs?: {
       priceCurrency?: string
@@ -72,7 +70,7 @@ export class ByProjectKeyProductsByIDRequestBuilder {
     )
   }
   /**
-   *	Checks if product with given ID exists.
+   *	Check if a Product exists with a specified `id`. Responds with a `200 OK` status if the Product exists or `404 Not Found` otherwise.
    */
   public head(methodArgs?: {
     headers?: {
@@ -124,6 +122,9 @@ export class ByProjectKeyProductsByIDRequestBuilder {
       this.args.executeRequest
     )
   }
+  /**
+   *	Produces the [ProductDeletedMessage](/message-types#productdeletedmessage).
+   */
   public delete(methodArgs: {
     queryArgs: {
       priceCurrency?: string

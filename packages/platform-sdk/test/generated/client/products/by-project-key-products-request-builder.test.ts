@@ -125,6 +125,14 @@ export function getRequestsWithMethodParameters(): RequestWithMethod[] {
     },
     {
       method: 'head',
+      uri: '/test_projectKey/products?where=where',
+      request: apiRoot
+        .withProjectKey({ projectKey: 'test_projectKey' })
+        .products()
+        .head({ queryArgs: { where: 'where' } }),
+    },
+    {
+      method: 'head',
       uri: '/test_projectKey/products',
       request: apiRoot
         .withProjectKey({ projectKey: 'test_projectKey' })

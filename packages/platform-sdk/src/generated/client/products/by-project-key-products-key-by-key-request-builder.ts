@@ -7,7 +7,8 @@ import { Product, ProductUpdate } from '../../models/product'
 import { executeRequest, QueryParam } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyProductsKeyByKeyProductSelectionsRequestBuilder } from '../product-selections/by-project-key-products-key-by-key-product-selections-request-builder'
-
+/**
+ **/
 export class ByProjectKeyProductsKeyByKeyRequestBuilder {
   constructor(
     protected readonly args: {
@@ -29,9 +30,6 @@ export class ByProjectKeyProductsKeyByKeyRequestBuilder {
     })
   }
 
-  /**
-   *	Gets the full representation of a product by Key.
-   */
   public get(methodArgs?: {
     queryArgs?: {
       priceCurrency?: string
@@ -62,7 +60,7 @@ export class ByProjectKeyProductsKeyByKeyRequestBuilder {
     )
   }
   /**
-   *	Checks if product with given key exists.
+   *	Check if a Product exists with a specified `key`. Responds with a `200 OK` status if the Product exists or `404 Not Found` otherwise.
    */
   public head(methodArgs?: {
     headers?: {
@@ -114,6 +112,9 @@ export class ByProjectKeyProductsKeyByKeyRequestBuilder {
       this.args.executeRequest
     )
   }
+  /**
+   *	Produces the [ProductDeletedMessage](/message-types#productdeletedmessage).
+   */
   public delete(methodArgs: {
     queryArgs: {
       priceCurrency?: string

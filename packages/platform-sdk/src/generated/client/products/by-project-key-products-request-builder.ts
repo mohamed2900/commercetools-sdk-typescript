@@ -12,7 +12,8 @@ import { executeRequest, QueryParam } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 import { ByProjectKeyProductsByIDRequestBuilder } from './by-project-key-products-by-id-request-builder'
 import { ByProjectKeyProductsKeyByKeyRequestBuilder } from './by-project-key-products-key-by-key-request-builder'
-
+/**
+ **/
 export class ByProjectKeyProductsRequestBuilder {
   constructor(
     protected readonly args: {
@@ -49,9 +50,7 @@ export class ByProjectKeyProductsRequestBuilder {
   }
 
   /**
-   *	You can use the query endpoint to get the full representations of products.
-   *	REMARK: We suggest to use the performance optimized search endpoint which has a bunch functionalities,
-   *	the query API lacks like sorting on custom attributes, etc.
+   *	Use the query endpoint to get a full representation of Products.
    *
    */
   public get(methodArgs?: {
@@ -89,9 +88,13 @@ export class ByProjectKeyProductsRequestBuilder {
     )
   }
   /**
-   *	Checks if products exist.
+   *	Check if Products exist. Responds with a `200 OK` status if any Products match the Query Predicate, or `404 Not Found` otherwise.
    */
   public head(methodArgs?: {
+    queryArgs?: {
+      where?: string
+      [key: string]: QueryParam
+    }
     headers?: {
       [key: string]: string | string[]
     }
@@ -105,14 +108,13 @@ export class ByProjectKeyProductsRequestBuilder {
         headers: {
           ...methodArgs?.headers,
         },
+        queryParams: methodArgs?.queryArgs,
       },
       this.args.executeRequest
     )
   }
   /**
-   *	To create a new product, send a representation that is going to become the initial staged representation
-   *	of the new product in the master catalog. If price selection query parameters are provided,
-   *	the selected prices will be added to the response.
+   *	To create a new Product, send a representation that is going to become the initial _staged_ representation of the new Product in the master catalog. If Price selection query parameters are included, selected Prices will be added to the response. Produces the [ProductCreatedMessage](/message-types#productcreatedmessage).
    *
    */
   public post(methodArgs: {

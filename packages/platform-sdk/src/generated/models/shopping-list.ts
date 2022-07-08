@@ -204,6 +204,8 @@ export interface ShoppingListLineItem {
    */
   readonly quantity: number
   /**
+   *	Represents a single sellable product (often an individual SKU).
+   *
    *
    */
   readonly variant?: ProductVariant
