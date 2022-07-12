@@ -1,9 +1,9 @@
 import type {
+  ConcurrentModificationMiddlewareOptions,
   Middleware,
   MiddlewareRequest,
   MiddlewareResponse,
   Next,
-  ConcurrentModificationMiddlewareOptions,
 } from '../types/sdk.d'
 const Buffer = require('buffer/').Buffer
 
