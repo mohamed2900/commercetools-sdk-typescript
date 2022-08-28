@@ -565,24 +565,32 @@ export interface GeoJsonPoint {
 }
 export interface Image {
   /**
+   *	URL of the image in its original size that must be unique within a single [ProductVariant](ctp:api:type:ProductVariant).
+   *
    *
    */
   readonly url: string
   /**
+   *	Dimensions of the original image.
+   *
    *
    */
   readonly dimensions: ImageDimensions
   /**
+   *	Custom label for the image.
+   *
    *
    */
   readonly label?: string
 }
 export interface ImageDimensions {
   /**
+   *	Width of the image.
    *
    */
   readonly w: number
   /**
+   *	Height of the image.
    *
    */
   readonly h: number
@@ -655,6 +663,9 @@ export interface Money {
  *	MoneyType supports two different values, one for amounts in cent precision and another one for sub-cent amounts up to 20 fraction digits.
  */
 export type MoneyType = 'centPrecision' | 'highPrecision'
+/**
+ *	The represention for [embedded Prices](ctp:api:type:ProductPriceModeEnum); for Standalone Prices refer to [StandalonePrice](ctp:api:type:StandalonePrice) instead.
+ */
 export interface Price {
   /**
    *	Unique identifier of this Price.
@@ -719,6 +730,9 @@ export interface Price {
    */
   readonly custom?: CustomFields
 }
+/**
+ *	The draft represention for [embedded Prices](ctp:api:type:ProductPriceModeEnum); for Standalone Prices refer to [StandalonePriceDraft](ctp:api:type:StandalonePriceDraft) instead.
+ */
 export interface PriceDraft {
   /**
    *	Money value of this Price.
@@ -745,21 +759,21 @@ export interface PriceDraft {
    */
   readonly channel?: ChannelResourceIdentifier
   /**
-   *	Set this field if this Price is valid only valid from the specified date and time.
+   *	Set this field if this Price is only valid from the specified date and time. Must be at least 1 ms before `validUntil`.
    *
    *
    */
   readonly validFrom?: string
   /**
-   *	Set this field if this Price is valid only valid until the specified date and time.
+   *	Set this field if this Price is only valid until the specified date and time. Must be at least 1 ms after `validFrom`.
    *
    *
    */
   readonly validUntil?: string
   /**
-   *	Set this field to add a DiscountedPrice from an external service.
+   *	Set this field to add a DiscountedPrice from an **external service**.
    *
-   *	The API sets this field automatically if at least one [ProductDiscount](ctp:api:type:ProductDiscount) applies.
+   *	Otherwise, Composable Commerce sets this field automatically if at least one [ProductDiscount](ctp:api:type:ProductDiscount) applies.
    *	The DiscountedPrice must reference a ProductDiscount with:
    *
    *	* The `isActive` flag set to `true`.
@@ -994,55 +1008,70 @@ export type ResourceIdentifier =
   | TaxCategoryResourceIdentifier
   | TypeResourceIdentifier
   | ZoneResourceIdentifier
+/**
+ *	Scoped Price is contained in a [ProductVariant](ctp:api:type:ProductVariant) which is returned in response to a
+ *	[Search Product Projection](ctp:api:type:ProductProjectionSearchFilterScopedPrice) request when Price Selection is used.
+ *
+ */
 export interface ScopedPrice {
   /**
+   *	Platform-generated unique identifier of the Price.
+   *
    *
    */
   readonly id: string
   /**
-   *	Base polymorphic read-only Money type which is stored in cent precision or high precision. The actual type is determined by the `type` field.
+   *	Original value of the Price.
    *
    *
    */
   readonly value: TypedMoney
   /**
-   *	Base polymorphic read-only Money type which is stored in cent precision or high precision. The actual type is determined by the `type` field.
+   *	If available, either the original price `value` or `discounted` value.
    *
    *
    */
   readonly currentValue: TypedMoney
   /**
-   *	Two-digit country code as per [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).
+   *	Country code of the geographic location.
    *
    *
    */
   readonly country?: string
   /**
-   *	[Reference](ctp:api:type:Reference) to a [CustomerGroup](ctp:api:type:CustomerGroup).
+   *	Reference to a CustomerGroup.
    *
    *
    */
   readonly customerGroup?: CustomerGroupReference
   /**
-   *	[Reference](ctp:api:type:Reference) to a [Channel](ctp:api:type:Channel).
+   *	Reference to a Channel.
    *
    *
    */
   readonly channel?: ChannelReference
   /**
+   *	Date and time from which the Price is valid.
+   *
    *
    */
   readonly validFrom?: string
   /**
+   *	Date and time until which the Price is valid.
+   *
    *
    */
   readonly validUntil?: string
   /**
+   *	Is set if a matching [ProductDiscount](ctp:api:type:ProductDiscount) exists. If set, the [Cart](ctp:api:type:Cart) uses the discounted value for the [Cart Price calculation](ctp:api:type:CartAddLineItem).
+   *
+   *	When a [relative Product Discount](ctp:api:type:ProductDiscountValueRelative) is applied and the fractional part of the discounted Price is 0.5, the discounted Price is [rounded half down](https://en.wikipedia.org/wiki/Rounding#Round_half_down) in favor of the Customer.
+   *
    *
    */
   readonly discounted?: DiscountedPrice
   /**
-   *	Serves as value of the `custom` field on a resource or data type customized with a [Type](ctp:api:type:Type).
+   *	Custom Fields for the Price.
    *
    *
    */

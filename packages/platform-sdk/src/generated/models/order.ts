@@ -248,7 +248,7 @@ export interface Hit {
    *	The higher the value is, the more relevant the hit is for the search request.
    *
    */
-  readonly relevance: number
+  readonly relevance?: number
 }
 export interface OrderPagedSearchResponse {
   /**
@@ -629,7 +629,7 @@ export interface OrderFromCartDraft {
    */
   readonly id?: string
   /**
-   *	ResourceIdentifier to the Cart from which this order is created.
+   *	ResourceIdentifier of the Cart from which this order is created.
    *
    */
   readonly cart?: CartResourceIdentifier
@@ -674,12 +674,12 @@ export interface OrderFromCartDraft {
 }
 export interface OrderFromQuoteDraft {
   /**
-   *	ResourceIdentifier to the Quote from which this order is created. If the quote has `QuoteState` in `Accepted`, `Declined` or `Withdrawn` then the order creation will fail. The creation will also if the `Quote` has expired (`validTo` check).
+   *	ResourceIdentifier of the Quote from which this Order is created. If the Quote has `QuoteState` in `Accepted`, `Declined` or `Withdrawn` then the order creation will fail. The creation will also if the `Quote` has expired (`validTo` check).
    *
    */
   readonly quote: QuoteResourceIdentifier
   /**
-   *	The `version` of the [Quote](ctp:api:type:quote) from which an Order is created.
+   *	`version` of the [Quote](ctp:api:type:quote) from which an Order is created.
    *
    *
    */
@@ -1068,7 +1068,7 @@ export interface ProductVariantImportDraft {
    */
   readonly sku?: string
   /**
-   *	The [EmbeddedPrices](ctp:api:type:EmbeddedPrice) of the variant.
+   *	The embedded [Prices](ctp:api:type:Price) of the variant.
    *	The prices should not contain two prices for the same price scope (same currency, country, customer group, channel, valid from and valid until).
    *	If this property is defined, then it will override the `prices` property from the original product variant, otherwise `prices` property from the original product variant would be copied in the resulting order.
    *
