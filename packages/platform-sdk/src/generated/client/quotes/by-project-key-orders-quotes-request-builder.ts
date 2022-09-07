@@ -3,12 +3,12 @@
  * Please don't change this file manually but run `rmf-codegen generate raml_file_path -o output_path -t typescript_client` to update it.
  * For more information about the commercetools platform APIs, visit https://docs.commercetools.com/.
  */
-import { Cart } from '../../models/cart'
-import { executeRequest, QueryParam } from '../../shared/utils/common-types'
+import { Order, OrderFromQuoteDraft } from '../../models/order'
+import { executeRequest } from '../../shared/utils/common-types'
 import { ApiRequest } from '../../shared/utils/requests-utils'
 /**
  **/
-export class ByProjectKeyMeActiveCartRequestBuilder {
+export class ByProjectKeyOrdersQuotesRequestBuilder {
   constructor(
     protected readonly args: {
       pathArgs: {
@@ -18,25 +18,26 @@ export class ByProjectKeyMeActiveCartRequestBuilder {
       baseUri?: string
     }
   ) {}
-  public get(methodArgs?: {
-    queryArgs?: {
-      expand?: string | string[]
-      [key: string]: QueryParam
-    }
+  /**
+   *	Create an Order from a Quote
+   */
+  public post(methodArgs: {
+    body: OrderFromQuoteDraft
     headers?: {
       [key: string]: string | string[]
     }
-  }): ApiRequest<Cart> {
-    return new ApiRequest<Cart>(
+  }): ApiRequest<Order> {
+    return new ApiRequest<Order>(
       {
         baseUri: this.args.baseUri,
-        method: 'GET',
-        uriTemplate: '/{projectKey}/me/active-cart',
+        method: 'POST',
+        uriTemplate: '/{projectKey}/orders/quotes',
         pathVariables: this.args.pathArgs,
         headers: {
+          'Content-Type': 'application/json',
           ...methodArgs?.headers,
         },
-        queryParams: methodArgs?.queryArgs,
+        body: methodArgs?.body,
       },
       this.args.executeRequest
     )
