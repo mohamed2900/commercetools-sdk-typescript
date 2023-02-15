@@ -676,11 +676,14 @@ export interface OrderFromCartDraft {
    */
   readonly id?: string
   /**
-   *	ResourceIdentifier of the Cart from which this order is created.
+   *	ResourceIdentifier of the Cart from which the Order is created.
    *
    */
   readonly cart?: CartResourceIdentifier
   /**
+   *	Expected version of the Cart from which the Order is created.
+   *	If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+   *
    *
    */
   readonly version: number
@@ -700,10 +703,14 @@ export interface OrderFromCartDraft {
    */
   readonly purchaseOrderNumber?: string
   /**
+   *	Payment state for the Order.
+   *
    *
    */
   readonly paymentState?: PaymentState
   /**
+   *	Shipment state for the Order.
+   *
    *
    */
   readonly shipmentState?: ShipmentState
@@ -713,6 +720,8 @@ export interface OrderFromCartDraft {
    */
   readonly orderState?: OrderState
   /**
+   *	[Reference](ctp:api:type:Reference) to a [State](ctp:api:type:State) indicating the Order's state.
+   *
    *
    */
   readonly state?: StateResourceIdentifier
@@ -732,13 +741,13 @@ export interface OrderFromQuoteDraft {
    */
   readonly quote: QuoteResourceIdentifier
   /**
-   *	`version` of the [Quote](ctp:api:type:quote) from which an Order is created.
+   *	`version` of the [Quote](ctp:api:type:Quote) from which an Order is created.
    *
    *
    */
   readonly version: number
   /**
-   *	If `true`, the `quoteState` of the referenced [Quote](ctp:api:type:quote) will be set to `Accepted`.
+   *	If `true`, the `quoteState` of the referenced [Quote](ctp:api:type:Quote) will be set to `Accepted`.
    *
    *
    */
@@ -753,10 +762,13 @@ export interface OrderFromQuoteDraft {
    */
   readonly orderNumber?: string
   /**
+   *	Payment state of the Order.
+   *
    *
    */
   readonly paymentState?: PaymentState
   /**
+   *	Shipment state of the Order.
    *
    */
   readonly shipmentState?: ShipmentState
@@ -766,6 +778,8 @@ export interface OrderFromQuoteDraft {
    */
   readonly orderState?: OrderState
   /**
+   *	[Reference](ctp:api:type:Reference) to a [State](ctp:api:type:State) indicating the Order's state.
+   *
    *
    */
   readonly state?: StateResourceIdentifier
@@ -981,10 +995,15 @@ export type OrderState =
   | string
 export interface OrderUpdate {
   /**
+   *	Expected version of the Order on which the changes should be applied.
+   *	If the expected version does not match the actual version, a [409 Conflict](/../api/errors#409-conflict) error will be returned.
+   *
    *
    */
   readonly version: number
   /**
+   *	Update actions to be performed on the Order.
+   *
    *
    */
   readonly actions: OrderUpdateAction[]
@@ -1435,6 +1454,10 @@ export interface OrderAddDeliveryAction {
    */
   readonly shippingKey?: string
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address?: _BaseAddress
@@ -1451,6 +1474,10 @@ export interface OrderAddDeliveryAction {
 export interface OrderAddItemShippingAddressAction {
   readonly action: 'addItemShippingAddress'
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address: _BaseAddress
@@ -1574,6 +1601,10 @@ export interface OrderRemovePaymentAction {
 export interface OrderSetBillingAddressAction {
   readonly action: 'setBillingAddress'
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address?: _BaseAddress
@@ -1717,6 +1748,10 @@ export interface OrderSetDeliveryAddressAction {
    */
   readonly deliveryId: string
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address?: _BaseAddress
@@ -2077,6 +2112,10 @@ export interface OrderSetReturnShipmentStateAction {
 export interface OrderSetShippingAddressAction {
   readonly action: 'setShippingAddress'
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address?: _BaseAddress
@@ -2193,6 +2232,10 @@ export interface OrderTransitionStateAction {
 export interface OrderUpdateItemShippingAddressAction {
   readonly action: 'updateItemShippingAddress'
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address: _BaseAddress

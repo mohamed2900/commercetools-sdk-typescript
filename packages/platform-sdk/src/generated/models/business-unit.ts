@@ -4,6 +4,7 @@
  * For more information about the commercetools platform APIs, visit https://docs.commercetools.com/.
  */
 
+import { AssociateRoleResourceIdentifier } from './associate-role'
 import {
   Address,
   BaseAddress,
@@ -22,11 +23,17 @@ import {
 
 export interface Associate {
   /**
-   *	Roles the Associate holds within the Business Unit.
+   *	Roles assignment to the Associate within the Business Unit.
    *
    *
    */
-  readonly roles: AssociateRole[]
+  readonly associateRoleAssignments: AssociateRoleAssignment[]
+  /**
+   *	Deprecated type. Use `associateRoleAssignment` instead.
+   *
+   *
+   */
+  readonly roles: AssociateRoleDeprecated[]
   /**
    *	The [Customer](ctp:api:type:Customer) that is part of the Business Unit.
    *
@@ -36,11 +43,17 @@ export interface Associate {
 }
 export interface AssociateDraft {
   /**
-   *	Roles the Associate should hold within the Business Unit.
+   *	Roles assignment to the Associate within the Business Unit.
    *
    *
    */
-  readonly roles: AssociateRole[]
+  readonly associateRoleAssignments?: AssociateRoleAssignment[]
+  /**
+   *	Deprecated type. Use `associateRoleAssignment` instead.
+   *
+   *
+   */
+  readonly roles?: AssociateRoleDeprecated[]
   /**
    *	The [Customer](ctp:api:type:Customer) to be part of the Business Unit.
    *
@@ -48,13 +61,29 @@ export interface AssociateDraft {
    */
   readonly customer: CustomerResourceIdentifier
 }
+export interface AssociateRoleAssignment {
+  /**
+   *	Role the Associate holds within the Business Unit.
+   *
+   *
+   */
+  readonly associateRole: AssociateRoleResourceIdentifier
+}
+export interface AssociateRoleAssignmentDraft {
+  /**
+   *	Role the Associate holds within the Business Unit.
+   *
+   *
+   */
+  readonly associateRole?: AssociateRoleResourceIdentifier
+}
 /**
  *	Roles defining how an [Associate](ctp:api:type:Associate) can interact with a Business Unit.
  *
  */
-export type AssociateRole = 'Admin' | 'Buyer' | string
+export type AssociateRoleDeprecated = 'Admin' | 'Buyer' | string
 /**
- *	Generic type to model those fields all Business Units have in common.
+ *	Generic type to model the fields that all types of Business Units have in common.
  *
  */
 export type BusinessUnit = Company | Division

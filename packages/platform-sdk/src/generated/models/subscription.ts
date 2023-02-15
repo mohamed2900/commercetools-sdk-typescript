@@ -333,6 +333,7 @@ export interface MessageSubscription {
  *
  */
 export type MessageSubscriptionResourceTypeId =
+  | 'associate-role'
   | 'business-unit'
   | 'category'
   | 'customer'

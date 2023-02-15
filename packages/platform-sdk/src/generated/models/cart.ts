@@ -484,10 +484,15 @@ export interface CartResourceIdentifier {
 export type CartState = 'Active' | 'Frozen' | 'Merged' | 'Ordered' | string
 export interface CartUpdate {
   /**
+   *	Expected version of the Cart on which the changes should be applied.
+   *	If the expected version does not match the actual version, a [ConcurrentModification](ctp:api:type:ConcurrentModificationError) error is returned.
+   *
    *
    */
   readonly version: number
   /**
+   *	Update actions to be performed on the Cart.
+   *
    *
    */
   readonly actions: CartUpdateAction[]
@@ -1177,11 +1182,13 @@ export interface MethodTaxedPrice {
 }
 export interface ReplicaCartDraft {
   /**
+   *	[Reference](ctp:api:type:Reference) to a [Cart](ctp:api:type:Cart) or an [Order](ctp:api:type:Order).
+   *
    *
    */
   readonly reference: CartReference | OrderReference
   /**
-   *	User-specific unique identifier of the cart.
+   *	User-specific unique identifier of the Cart.
    *
    */
   readonly key?: string
@@ -1595,6 +1602,10 @@ export interface CartAddDiscountCodeAction {
 export interface CartAddItemShippingAddressAction {
   readonly action: 'addItemShippingAddress'
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address: _BaseAddress
@@ -2536,6 +2547,10 @@ export interface CartUnfreezeCartAction {
 export interface CartUpdateItemShippingAddressAction {
   readonly action: 'updateItemShippingAddress'
   /**
+   *	Polymorphic base type that represents a postal address and contact details.
+   *	Depending on the read or write action, it can be either [Address](ctp:api:type:Address) or [AddressDraft](ctp:api:type:AddressDraft) that
+   *	only differ in the data type for the optional `custom` field.
+   *
    *
    */
   readonly address: _BaseAddress
