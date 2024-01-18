@@ -33,14 +33,12 @@ import {
   Associate,
   AttributeConstraintEnum,
   AttributeDefinition,
-  AttributeLocalizedEnumValue,
-  AttributePlainEnumValue,
   AuthenticationMode,
   BusinessUnitAssociateMode,
   BusinessUnitStatus,
   BusinessUnitStoreMode,
   CategoryOrderHints,
-  ChannelRoleEnum,
+  ChannelRole,
   CustomFields,
   CustomLineItem,
   Delivery,
@@ -82,8 +80,8 @@ import {
   ShipmentState,
   StackingMode,
   StagedQuoteState,
-  StateRoleEnum,
-  StateTypeEnum,
+  StateRole,
+  StateType,
   StoreCountry,
   SyncInfo,
   TaxCalculationMode,
@@ -404,6 +402,11 @@ export interface AddAddressChange {
    */
   readonly change: string
   /**
+   *	Value before the change.
+   *
+   */
+  readonly previousValue: Address
+  /**
    *	Value after the change.
    *
    */
@@ -501,12 +504,12 @@ export interface AddChannelRolesChange {
    *	Value before the change.
    *
    */
-  readonly previousValue: ChannelRoleEnum[]
+  readonly previousValue: ChannelRole[]
   /**
    *	Value after the change.
    *
    */
-  readonly nextValue: ChannelRoleEnum[]
+  readonly nextValue: ChannelRole[]
 }
 /**
  *	Change triggered by the [Add CustomLineItem](ctp:api:type:StagedOrderAddCustomLineItemAction) update action.
@@ -696,7 +699,7 @@ export interface AddLocalizedEnumValueChange {
    *	Value after the change.
    *
    */
-  readonly nextValue: AttributeLocalizedEnumValue
+  readonly nextValue: LocalizedEnumValue
   /**
    *	Name of the updated [FieldDefinition](ctp:api:type:FieldDefinition); only present on changes to Types.
    *
@@ -717,6 +720,11 @@ export interface AddLocationChange {
    *
    */
   readonly change: string
+  /**
+   *	Value before the change.
+   *
+   */
+  readonly previousValue: Location
   /**
    *	Value after the change.
    *
@@ -805,7 +813,7 @@ export interface AddPlainEnumValueChange {
    *	Value after the change.
    *
    */
-  readonly nextValue: AttributePlainEnumValue
+  readonly nextValue: EnumValue
   /**
    *	Name of the updated [AttributeDefinition](ctp:api:type:AttributeDefinition).
    *
@@ -975,12 +983,12 @@ export interface AddStateRolesChange {
    *	Value before the change.
    *
    */
-  readonly previousValue: StateRoleEnum[]
+  readonly previousValue: StateRole[]
   /**
    *	Value after the change.
    *
    */
-  readonly nextValue: StateRoleEnum[]
+  readonly nextValue: StateRole[]
 }
 /**
  *	Change triggered by the [Add TaxRate](ctp:api:type:TaxCategoryAddTaxRateAction) update action.
@@ -1370,7 +1378,10 @@ export interface ChangeCustomLineItemQuantityChange {
   readonly customLineItemId: string
 }
 /**
- *	Change triggered by the [Change Description](ctp:api:type:ProductTypeChangeDescriptionAction) update action.
+ *	Change triggered by the following update actions:
+ *
+ *	- [Change Description](ctp:api:type:ChannelChangeDescriptionAction) on Channels.
+ *	- [Change Description](ctp:api:type:ProductTypeChangeDescriptionAction) on Product Types.
  *
  */
 export interface ChangeDescriptionChange {
@@ -1720,7 +1731,10 @@ export interface ChangeLineItemQuantityChange {
   readonly lineItemId: string
 }
 /**
- *	Change triggered by the [Change Description](ctp:api:type:ChannelChangeDescriptionAction) update action.
+ *	Change triggered by the following update actions:
+ *
+ *	- [Change Description](ctp:api:type:ProductTypeChangeDescriptionAction) on Product Types.
+ *	- [Change Description](ctp:api:type:ChannelChangeDescriptionAction) on Channels.
  *
  */
 export interface ChangeLocalizedDescriptionChange {
@@ -1819,10 +1833,14 @@ export interface ChangeLocalizedEnumValueOrderChange {
  *	- [Change Name](ctp:api:type:CartDiscountChangeNameAction) on Cart Discounts.
  *	- [Change Name](ctp:api:type:CategoryChangeNameAction) on Categories.
  *	- [Change Name](ctp:api:type:ChannelChangeNameAction) on Channels.
+ *	- [Change Name](ctp:api:type:CustomerGroupChangeNameAction) on Customer Groups.
  *	- [Change Name](ctp:api:type:ProductChangeNameAction) on Products.
  *	- [Change Name](ctp:api:type:ProductDiscountChangeNameAction) on Product Discounts.
  *	- [Change Name](ctp:api:type:ProductSelectionChangeNameAction) on Product Selections.
+ *	- [Change Name](ctp:api:type:ProductTypeChangeNameAction) on Product Types.
  *	- [Change Name](ctp:api:type:ShoppingListChangeNameAction) on Shopping Lists.
+ *	- [Change Name](ctp:api:type:TaxCategoryChangeNameAction) on Tax Categories.
+ *	- [Change Name](ctp:api:type:TypeChangeNameAction) on Types.
  *	- [Change Name](ctp:api:type:ZoneChangeNameAction) on Zones.
  *
  */
@@ -1873,9 +1891,17 @@ export interface ChangeMasterVariantChange {
 /**
  *	Change triggered by the following update actions:
  *
+ *	- [Change Name](ctp:api:type:CartDiscountChangeNameAction) on Cart Discounts.
+ *	- [Change Name](ctp:api:type:CategoryChangeNameAction) on Categories.
+ *	- [Change Name](ctp:api:type:ChannelChangeNameAction) on Channels.
  *	- [Change Name](ctp:api:type:CustomerGroupChangeNameAction) on Customer Groups.
+ *	- [Change Name](ctp:api:type:ProductChangeNameAction) on Products.
+ *	- [Change Name](ctp:api:type:ProductDiscountChangeNameAction) on Product Discounts.
+ *	- [Change Name](ctp:api:type:ProductSelectionChangeNameAction) on Product Selections.
  *	- [Change Name](ctp:api:type:ProductTypeChangeNameAction) on Product Types.
+ *	- [Change Name](ctp:api:type:ShoppingListChangeNameAction) on Shopping Lists.
  *	- [Change Name](ctp:api:type:TaxCategoryChangeNameAction) on Tax Categories.
+ *	- [Change Name](ctp:api:type:TypeChangeNameAction) on Types.
  *	- [Change Name](ctp:api:type:ZoneChangeNameAction) on Zones.
  *
  */
@@ -2404,12 +2430,12 @@ export interface ChangeStateTypeChange {
    *	Value before the change.
    *
    */
-  readonly previousValue: StateTypeEnum
+  readonly previousValue: StateType
   /**
    *	Value after the change.
    *
    */
-  readonly nextValue: StateTypeEnum
+  readonly nextValue: StateType
 }
 /**
  *	Change triggered by the [Change Status](ctp:api:type:BusinessUnitChangeStatusAction) update action.
@@ -2819,12 +2845,12 @@ export interface RemoveChannelRolesChange {
    *	Value before the change.
    *
    */
-  readonly previousValue: ChannelRoleEnum[]
+  readonly previousValue: ChannelRole[]
   /**
    *	Value after the change.
    *
    */
-  readonly nextValue: ChannelRoleEnum[]
+  readonly nextValue: ChannelRole[]
 }
 /**
  *	Change triggered by the [Remove CustomLineItem](ctp:api:type:StagedOrderRemoveCustomLineItemAction) update action.
@@ -3032,6 +3058,11 @@ export interface RemoveLocationChange {
    *
    */
   readonly previousValue: Location
+  /**
+   *	Value after the change.
+   *
+   */
+  readonly nextValue: Location
 }
 /**
  *	Change triggered by the [Remove Parcel From Delivery](ctp:api:type:StagedOrderRemoveLineItemAction) update action.
@@ -3243,12 +3274,12 @@ export interface RemoveStateRolesChange {
    *	Value before the change.
    *
    */
-  readonly previousValue: StateRoleEnum[]
+  readonly previousValue: StateRole[]
   /**
    *	Value after the change.
    *
    */
-  readonly nextValue: StateRoleEnum[]
+  readonly nextValue: StateRole[]
 }
 /**
  *	Change triggered by the [Remove TaxRate](ctp:api:type:TaxCategoryRemoveTaxRateAction) update action.
@@ -3264,6 +3295,11 @@ export interface RemoveTaxRateChange {
    *
    */
   readonly previousValue: TaxRate
+  /**
+   *	Value after the change.
+   *
+   */
+  readonly nextValue: TaxRate
 }
 /**
  *	Change triggered by the [Remove TextLineItem](ctp:api:type:ShoppingListRemoveTextLineItemAction) update action.
@@ -3808,12 +3844,12 @@ export interface SetChannelRolesChange {
    *	Value before the change.
    *
    */
-  readonly previousValue: ChannelRoleEnum[]
+  readonly previousValue: ChannelRole[]
   /**
    *	Value after the change.
    *
    */
-  readonly nextValue: ChannelRoleEnum[]
+  readonly nextValue: ChannelRole[]
 }
 /**
  *	Change triggered by the [Set Company Name](ctp:api:type:CustomerSetCompanyNameAction) update action.
@@ -4556,7 +4592,15 @@ export interface SetDeliveryItemsChange {
 /**
  *	Change triggered by the following update actions:
  *
+ *	- [Set Description](ctp:api:type:CartDiscountSetDescriptionAction) on Cart Discounts.
+ *	- [Set Description](ctp:api:type:CategorySetDescriptionAction) on Categories.
+ *	- [Set Description](ctp:api:type:DiscountCodeSetDescriptionAction) on Discount Codes.
+ *	- [Set Description](ctp:api:type:ProductSetDescriptionAction) on Products.
+ *	- [Set Description](ctp:api:type:ProductDiscountSetDescriptionAction) on Product Discounts.
+ *	- [Set Description](ctp:api:type:ShoppingListSetDescriptionAction) on Shopping Lists.
+ *	- [Set Description](ctp:api:type:StateSetDescriptionAction) on States.
  *	- [Set Description](ctp:api:type:TaxCategorySetDescriptionAction) on Tax Categories.
+ *	- [Set Description](ctp:api:type:TypeSetDescriptionAction) on Types.
  *	- [Set Description](ctp:api:type:ZoneSetDescriptionAction) on Zones.
  *
  */
@@ -5278,7 +5322,9 @@ export interface SetLocaleChange {
  *	- [Set Description](ctp:api:type:ProductDiscountSetDescriptionAction) on Product Discounts.
  *	- [Set Description](ctp:api:type:ShoppingListSetDescriptionAction) on Shopping Lists.
  *	- [Set Description](ctp:api:type:StateSetDescriptionAction) on States.
+ *	- [Set Description](ctp:api:type:TaxCategorySetDescriptionAction) on Tax Categories.
  *	- [Set Description](ctp:api:type:TypeSetDescriptionAction) on Types.
+ *	- [Set Description](ctp:api:type:ZoneSetDescriptionAction) on Zones.
  *
  */
 export interface SetLocalizedDescriptionChange {
@@ -6482,12 +6528,12 @@ export interface SetStateRolesChange {
    *	Value before the change.
    *
    */
-  readonly previousValue: StateRoleEnum[]
+  readonly previousValue: StateRole[]
   /**
    *	Value after the change.
    *
    */
-  readonly nextValue: StateRoleEnum[]
+  readonly nextValue: StateRole[]
 }
 /**
  *	Change triggered by the [Set StatusInterfaceCode](ctp:api:type:PaymentSetStatusInterfaceCodeAction) update action.

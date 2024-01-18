@@ -69,6 +69,10 @@ export interface ExternalOAuth {
  *	Specifies the status of the [Order Search](/../api/projects/order-search) index.
  */
 export type OrderSearchStatus = 'Activated' | 'Deactivated' | string
+/**
+ *	Specifies the status of the [Product Search](/../api/projects/product-search) index.
+ */
+export type ProductSearchStatus = 'Activated' | 'Deactivated' | string
 export interface Project {
   /**
    *	Current version of the Project.
@@ -187,6 +191,7 @@ export type ProjectUpdateAction =
   | ProjectChangeNameAction
   | ProjectChangeOrderSearchStatusAction
   | ProjectChangeProductSearchIndexingEnabledAction
+  | ProjectChangeProductSearchStatusAction
   | ProjectChangeShoppingListsConfigurationAction
   | ProjectSetBusinessUnitAssociateRoleOnCreationAction
   | ProjectSetExternalOAuthAction
@@ -201,6 +206,11 @@ export interface SearchIndexingConfiguration {
    *
    */
   readonly products?: SearchIndexingConfigurationValues
+  /**
+   *	Configuration for the [Product Search](/../api/projects/product-search) feature.
+   *
+   */
+  readonly productsNew?: SearchIndexingConfigurationValues
   /**
    *	Configuration for the [Order Search](/../api/projects/order-search) feature.
    *
@@ -368,6 +378,14 @@ export interface ProjectChangeProductSearchIndexingEnabledAction {
    *
    */
   readonly enabled: boolean
+}
+export interface ProjectChangeProductSearchStatusAction {
+  readonly action: 'changeProductSearchStatus'
+  /**
+   *	Activates or deactivates the [Product Search](/../api/projects/product-search) feature. Activation will trigger building a search index for the Products in the Project.
+   *
+   */
+  readonly status: ProductSearchStatus
 }
 export interface ProjectChangeShoppingListsConfigurationAction {
   readonly action: 'changeShoppingListsConfiguration'
