@@ -97,7 +97,6 @@ export type ErrorObject =
   | MissingTaxRateForCountryError
   | MoneyOverflowError
   | NoMatchingProductDiscountFoundError
-  | NotEnabledError
   | ObjectNotFoundError
   | OutOfStockError
   | OverCapacityError
@@ -181,7 +180,7 @@ export interface AssociateMissingPermissionError {
 /**
  *	Returned when the `name` of the [AttributeDefinition](ctp:api:type:AttributeDefinition) conflicts with an existing Attribute.
  *
- *	The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
+ *	The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
  *
  */
 export interface AttributeDefinitionAlreadyExistsError {
@@ -215,7 +214,7 @@ export interface AttributeDefinitionAlreadyExistsError {
 /**
  *	Returned when the `type` is different for an AttributeDefinition using the same `name` in multiple Product Types.
  *
- *	The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request.
+ *	The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request.
  *
  */
 export interface AttributeDefinitionTypeConflictError {
@@ -576,7 +575,7 @@ export interface DuplicatePriceScopeError {
  *	Returned when the given Price scope conflicts with the Price scope of an existing Standalone Price.
  *	Every Standalone Price associated with the same SKU must have a distinct combination of currency, country, Customer Group, Channel, and validity periods (`validFrom` and `validUntil`).
  *
- *	The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+ *	The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
  *
  */
 export interface DuplicateStandalonePriceScopeError {
@@ -660,7 +659,7 @@ export interface DuplicateVariantValuesError {
 /**
  *	Returned when a preview to find an appropriate Shipping Method for an OrderEdit could not be generated.
  *
- *	The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](/../api/projects/shippingMethods#for-an-orderedit) request.
+ *	The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](ctp:api:endpoint:/{projectKey}/shipping-methods/matching-orderedit:GET) request.
  *
  */
 export interface EditPreviewFailedError {
@@ -1046,8 +1045,8 @@ export interface InternalConstraintViolatedError {
  *
  *	The error is returned as a failed response to:
  *
- *	- [Authenticate a global Customer (Sign-in)](/../api/projects/customers#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/customers#authenticate-sign-in-customer-in-store) requests on Customers.
- *	- [Authenticating Customer (Sign-in)](/../api/projects/me-profile#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/me-profile#authenticate-sign-in-customer-in-store) requests on My Customer Profile.
+ *	- [Authenticate a global Customer (Sign-in)](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate Customer (Sign-in) in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests on Customers.
+ *	- [Authenticating Customer (Sign-in)](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate Customer (Sign-in) in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) requests on My Customer Profile.
  *
  */
 export interface InvalidCredentialsError {
@@ -1065,8 +1064,8 @@ export interface InvalidCredentialsError {
  *
  *	The error is returned as a failed response to:
  *
- *	- [Change Customer Password](/../api/projects/customers#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/customers#change-password-of-customer-in-store) requests on Customers.
- *	- [Change Customer Password](/../api/projects/me-profile#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/me-profile#change-password-of-customer-in-store) requests on My Customer Profile.
+ *	- [Change Customer Password](ctp:api:endpoint:/{projectKey}/customers/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/customers/password:POST) requests on Customers.
+ *	- [Change Customer Password](ctp:api:endpoint:/{projectKey}/me/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/password:POST) requests on My Customer Profile.
  *
  */
 export interface InvalidCurrentPasswordError {
@@ -1348,12 +1347,12 @@ export interface MaxStoreReferencesReachedError {
  *	Returned when one of the following states occur:
  *
  *	- [Channel](ctp:api:type:Channel) is added or set on a [Store](ctp:api:type:Store) with missing Channel `roles`.
- *	- [Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) references a Channel that does not contain the `ProductDistribution` role.
+ *	- [Standalone Price](ctp:api:type:StandalonePrice) references a Channel that does not contain the `ProductDistribution` role.
  *
  *	The error is returned as a failed response to:
  *
  *	- [Add Distribution Channel](ctp:api:type:StoreAddDistributionChannelAction), [Set Distribution Channel](ctp:api:type:StoreSetDistributionChannelsAction), [Add Supply Channel](ctp:api:type:StoreAddSupplyChannelAction), and [Set Supply Channel](ctp:api:type:StoreSetSupplyChannelsAction) update actions.
- *	- [Create a Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) request.
+ *	- [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
  *
  */
 export interface MissingRoleOnChannelError {
@@ -1434,7 +1433,7 @@ export interface MoneyOverflowError {
 /**
  *	Returned when a Product Discount could not be found that could be applied to the Price of a Product Variant.
  *
- *	The error is returned as a failed response to the [Get Matching ProductDiscount](/../api/projects/productDiscounts#get-matching-productdiscount) request.
+ *	The error is returned as a failed response to the [Get Matching ProductDiscount](ctp:api:endpoint:/{projectKey}/product-discounts/matching:POST) request.
  *
  */
 export interface NoMatchingProductDiscountFoundError {
@@ -1442,20 +1441,6 @@ export interface NoMatchingProductDiscountFoundError {
   [key: string]: any
   /**
    *	`"Couldn't find a matching product discount for: productId=$productId, variantId=$variantId, price=$price."`
-   *
-   *
-   */
-  readonly message: string
-}
-/**
- *	Returned when the [Project-specific category recommendations feature](/../api/projects/categoryRecommendations#project-specific-category-recommendations) is not enabled for the Project.
- *
- */
-export interface NotEnabledError {
-  readonly code: 'NotEnabled'
-  [key: string]: any
-  /**
-   *	`"The category recommendations API is not yet enabled for your project."`
    *
    *
    */
@@ -1525,7 +1510,7 @@ export interface OverCapacityError {
  *	Returned when a given Price validity period conflicts with an existing one.
  *	Every Standalone Price associated with the same SKU and with the same combination of currency, country, Customer Group, and Channel, must have non-overlapping validity periods (`validFrom` and `validUntil`).
  *
- *	The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+ *	The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
  *
  */
 export interface OverlappingStandalonePriceValidityError {
@@ -2045,7 +2030,6 @@ export type GraphQLErrorObject =
   | GraphQLMissingTaxRateForCountryError
   | GraphQLMoneyOverflowError
   | GraphQLNoMatchingProductDiscountFoundError
-  | GraphQLNotEnabledError
   | GraphQLObjectNotFoundError
   | GraphQLOutOfStockError
   | GraphQLOverCapacityError
@@ -2115,7 +2099,7 @@ export interface GraphQLAssociateMissingPermissionError {
 /**
  *	Returned when the `name` of the [AttributeDefinition](ctp:api:type:AttributeDefinition) conflicts with an existing Attribute.
  *
- *	The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
+ *	The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request or [Change AttributeDefinition Name](ctp:api:type:ProductTypeChangeAttributeNameAction) update action.
  *
  */
 export interface GraphQLAttributeDefinitionAlreadyExistsError {
@@ -2143,7 +2127,7 @@ export interface GraphQLAttributeDefinitionAlreadyExistsError {
 /**
  *	Returned when the `type` is different for an AttributeDefinition using the same `name` in multiple Product Types.
  *
- *	The error is returned as a failed response to the [Create ProductType](/../api/projects/productTypes#create-producttype) request.
+ *	The error is returned as a failed response to the [Create ProductType](ctp:api:endpoint:/{projectKey}/product-types:POST) request.
  *
  */
 export interface GraphQLAttributeDefinitionTypeConflictError {
@@ -2421,7 +2405,7 @@ export interface GraphQLDuplicatePriceScopeError {
  *	Returned when the given Price scope conflicts with the Price scope of an existing Standalone Price.
  *	Every Standalone Price associated with the same SKU must have a distinct combination of currency, country, Customer Group, Channel, and validity periods (`validFrom` and `validUntil`).
  *
- *	The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+ *	The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
  *
  */
 export interface GraphQLDuplicateStandalonePriceScopeError {
@@ -2493,7 +2477,7 @@ export interface GraphQLDuplicateVariantValuesError {
 /**
  *	Returned when a preview to find an appropriate Shipping Method for an OrderEdit could not be generated.
  *
- *	The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](/../api/projects/shippingMethods#for-an-orderedit) request.
+ *	The error is returned as a failed response to the [Get Shipping Methods for an OrderEdit](ctp:api:endpoint:/{projectKey}/shipping-methods/matching-orderedit:GET) request.
  *
  */
 export interface GraphQLEditPreviewFailedError {
@@ -2718,8 +2702,8 @@ export interface GraphQLInternalConstraintViolatedError {
  *
  *	The error is returned as a failed response to:
  *
- *	- [Authenticate a global Customer (Sign-in)](/../api/projects/customers#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/customers#authenticate-sign-in-customer-in-store) requests on Customers.
- *	- [Authenticating Customer (Sign-in)](/../api/projects/me-profile#authenticate-sign-in-customer) and [Authenticate Customer (Sign-in) in a Store](/../api/projects/me-profile#authenticate-sign-in-customer-in-store) requests on My Customer Profile.
+ *	- [Authenticate a global Customer (Sign-in)](ctp:api:endpoint:/{projectKey}/login:POST) and [Authenticate Customer (Sign-in) in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/login:POST) requests on Customers.
+ *	- [Authenticating Customer (Sign-in)](ctp:api:endpoint:/{projectKey}/me/login:POST) and [Authenticate Customer (Sign-in) in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/login:POST) requests on My Customer Profile.
  *
  */
 export interface GraphQLInvalidCredentialsError {
@@ -2731,8 +2715,8 @@ export interface GraphQLInvalidCredentialsError {
  *
  *	The error is returned as a failed response to:
  *
- *	- [Change Customer Password](/../api/projects/customers#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/customers#change-password-of-customer-in-store) requests on Customers.
- *	- [Change Customer Password](/../api/projects/me-profile#change-password-of-customer) and [Change Customer Password in a Store](/../api/projects/me-profile#change-password-of-customer-in-store) requests on My Customer Profile.
+ *	- [Change Customer Password](ctp:api:endpoint:/{projectKey}/customers/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/customers/password:POST) requests on Customers.
+ *	- [Change Customer Password](ctp:api:endpoint:/{projectKey}/me/password:POST) and [Change Customer Password in a Store](ctp:api:endpoint:/{projectKey}/in-store/key={storeKey}/me/password:POST) requests on My Customer Profile.
  *
  */
 export interface GraphQLInvalidCurrentPasswordError {
@@ -2936,12 +2920,12 @@ export interface GraphQLMaxStoreReferencesReachedError {
  *	Returned when one of the following states occur:
  *
  *	- [Channel](ctp:api:type:Channel) is added or set on a [Store](ctp:api:type:Store) with missing Channel `roles`.
- *	- [Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) references a Channel that does not contain the `ProductDistribution` role.
+ *	- [Standalone Price](ctp:api:type:StandalonePrice) references a Channel that does not contain the `ProductDistribution` role.
  *
  *	The error is returned as a failed response to:
  *
  *	- [Add Distribution Channel](ctp:api:type:StoreAddDistributionChannelAction), [Set Distribution Channel](ctp:api:type:StoreSetDistributionChannelsAction), [Add Supply Channel](ctp:api:type:StoreAddSupplyChannelAction), and [Set Supply Channel](ctp:api:type:StoreSetSupplyChannelsAction) update actions.
- *	- [Create a Standalone Price](/../api/projects/standalone-prices#create-standaloneprice) request.
+ *	- [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
  *
  */
 export interface GraphQLMissingRoleOnChannelError {
@@ -3004,19 +2988,11 @@ export interface GraphQLMoneyOverflowError {
 /**
  *	Returned when a Product Discount could not be found that could be applied to the Price of a Product Variant.
  *
- *	The error is returned as a failed response to the [Get Matching ProductDiscount](/../api/projects/productDiscounts#get-matching-productdiscount) request.
+ *	The error is returned as a failed response to the [Get Matching ProductDiscount](ctp:api:endpoint:/{projectKey}/product-discounts/matching:POST) request.
  *
  */
 export interface GraphQLNoMatchingProductDiscountFoundError {
   readonly code: 'NoMatchingProductDiscountFound'
-  [key: string]: any
-}
-/**
- *	Returned when the [Project-specific category recommendations feature](/../api/projects/categoryRecommendations#project-specific-category-recommendations) is not enabled for the Project.
- *
- */
-export interface GraphQLNotEnabledError {
-  readonly code: 'NotEnabled'
   [key: string]: any
 }
 /**
@@ -3066,7 +3042,7 @@ export interface GraphQLOverCapacityError {
  *	Returned when a given Price validity period conflicts with an existing one.
  *	Every Standalone Price associated with the same SKU and with the same combination of currency, country, Customer Group, and Channel, must have non-overlapping validity periods (`validFrom` and `validUntil`).
  *
- *	The error is returned as a failed response to the [Create StandalonePrice](/../api/projects/standalone-prices#create-standaloneprice) request.
+ *	The error is returned as a failed response to the [Create StandalonePrice](ctp:api:endpoint:/{projectKey}/standalone-prices:POST) request.
  *
  */
 export interface GraphQLOverlappingStandalonePriceValidityError {

@@ -166,8 +166,8 @@ export interface ProductSearchProjectionParams {
 export interface ProductSearchQuery {}
 export type _ProductSearchQuery =
   | ProductSearchQuery
-  | ProductSearchCompoundExpression
-  | ProductSearchQueryExpression
+  | _ProductSearchCompoundExpression
+  | _ProductSearchQueryExpression
 export interface ProductSearchCompoundExpression extends ProductSearchQuery {}
 export type _ProductSearchCompoundExpression =
   | ProductSearchCompoundExpression
