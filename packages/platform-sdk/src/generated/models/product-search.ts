@@ -115,7 +115,7 @@ export interface ProductSearchProjectionParams {
    *
    *
    */
-  readonly expand?: string
+  readonly expand?: string[]
   /**
    *	Set to `true` to retrieve the [staged](ctp:api:type:CurrentStaged) Product Projection
    *
@@ -484,10 +484,6 @@ export interface ProductSearchSorting {
    *
    */
   readonly filter?: _ProductSearchQueryExpression
-  /**
-   *
-   */
-  readonly internal?: boolean
 }
 export interface ProductSearchSuggestionExpression {}
 export type _ProductSearchSuggestionExpression =
